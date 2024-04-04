@@ -53,7 +53,9 @@ async function getBabyDetail(req, res) {
 }
 //getbyId
 async function getBabyDetailId(req, res) {
-  const { id } = res.params;
+
+  const { id } = req.params;
+
   let babyList = {};
   const feedList = [];
   try {
