@@ -35,6 +35,7 @@ export async function RegisterUser(req,res){
         return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
       }
 }
+//login
 export async function LoginUser(req,res){
     try {
         const { email, password } = req.body;
