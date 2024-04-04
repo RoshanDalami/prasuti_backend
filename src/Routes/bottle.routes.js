@@ -6,7 +6,7 @@ const BottleRouter = express.Router();
 
 
 BottleRouter.route('/generateBottles').post(GenerateBottle);
-BottleRouter.route('/getBottles').get(GetBottle);
+BottleRouter.route('/getBottles/:id').get(GetBottle);
 
 
 export {BottleRouter}

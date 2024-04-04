@@ -147,9 +147,7 @@ async function createPasteurization(req, res) {
     }
     const savedData = await newPooling.save();
 
-
     return res.status(201).json(new ApiResponse(200, savedData, "Success"));
-
   } catch (error) {
     console.log(error);
     return res
@@ -180,7 +178,7 @@ async function getPasteurization(req, res) {
 }
 //getbyId
 async function getPasteurizationById(req, res) {
-  const id = res.params.id;
+  const id = req.params.id;
 
   try {
     if (!id) {
@@ -199,7 +197,7 @@ async function getPasteurizationById(req, res) {
 }
 //delete by ID
 async function deletePasteurizationById(req, res) {
-  const id = res.params.id;
+  const id = req.params.id;
   try {
     if (!id) {
       return res.status(400).json(new ApiResponse(400, null, "Id not found"));
