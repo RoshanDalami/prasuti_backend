@@ -6,7 +6,7 @@ import {
 } from "../Controller/baby.controller.js";
 const babyRoute = express.Router();
 babyRoute.route("/getBabyDetail").get(getBabyDetail);
-babyRoute.route("/getBabyDetailId:/id").get(getBabyDetailId);
+babyRoute.route("/getBabyDetailId/:id").get(getBabyDetailId);
 
 babyRoute.route("/createBabyDetail").post(createBabyDetail);
 

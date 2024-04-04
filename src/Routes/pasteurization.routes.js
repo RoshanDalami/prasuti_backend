@@ -10,8 +10,7 @@ import {
 } from "../Controller/pasteurization.controller.js";
 const pasteurizationRouter = express.Router();
 pasteurizationRouter.route("/getPasteurization").get(getPasteurization);
-pasteurizationRouter
-  .route("/getPasteurizationById/:id") 
+pasteurizationRouter.route("/getPasteurizationById/:id");
 pasteurizationRouter.route("/createPasteurization").post(createPasteurization);
 pasteurizationRouter
   .route("/deletePasteurizationById/:id")
