@@ -1,4 +1,7 @@
 import { DaanDarta } from "../Model/donorDetails.model.js";
+import { District } from "../Model/officeSetupModels/district.model.js";
+import { Palika } from "../Model/officeSetupModels/palika.model.js";
+import { State } from "../Model/officeSetupModels/state.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
 
@@ -12,6 +15,11 @@ export async function RegisterDonor(req,res){
     );
 
     let newDonorRegNo = "PMWH-001";
+
+    // const state = State.findOne({statedId : body?.address?.stateId})
+    // const district = District.findOne({districtId:body.address.districtId})
+    // const palika = Palika.findOne({palikaId:body.address.palikaId})
+    
 
     if (latestDaanDarta) {
       const lastDonorRegNo = latestDaanDarta.donorRegNo?.split("-")[1];

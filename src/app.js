@@ -3,7 +3,6 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 const app = express();
-console.log(process.env.CORS_ORIGIN, "from env");
 app.use(
 
     cors({
@@ -21,6 +20,7 @@ import { BottleRouter } from "./Routes/bottle.routes.js";
 import { RequsitionRoute } from "./Routes/requsition.routes.js";
 import { pasteurizationRouter } from "./Routes/pasteurization.routes.js";
 import { babyRoute } from "./Routes/baby.routes.js";
+import {SearchRouter} from './Routes/search.routes.js'
 app.use(express.urlencoded({extended:true}));
 app.use(express.json())
 app.use('/api/v1/user',UserRouter)
@@ -32,6 +32,7 @@ app.use('/api/v1/bottle',BottleRouter)
 app.use('/api/v1/milkRequsition',RequsitionRoute)
 app.use("/api/v1/pasteurization", pasteurizationRouter);
 app.use("/api/v1/baby", babyRoute);
+app.use("/api/v1/search", SearchRouter);
 app.get('/*',(req,res)=>{
     res.status(200).json({message:"Message from app express"})
 })

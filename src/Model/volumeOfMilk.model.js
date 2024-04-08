@@ -10,6 +10,10 @@ const collectedMilk = new Schema(
       type: Number,
       required: true,
     },
+    remaining:{
+      type:Number,
+
+    },
     temp: {
       type: Number,
       required: true,
