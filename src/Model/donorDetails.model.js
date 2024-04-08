@@ -17,6 +17,20 @@ const babyStatusSchema = new mongoose.Schema({
     type: Number,
   },
 });
+const addressSchema = new mongoose.Schema({
+  stateId:{
+    type:String,
+  },
+  districtId:{
+    type:String,
+  },
+  palikaId:{
+    type:String
+  },
+  ward:{
+    type:String
+  },
+})
 const serologyScreeningSchema = new mongoose.Schema({
   hiv: {
     type: Boolean,
@@ -145,9 +159,7 @@ const daanDartaSchema = new Schema(
     ethnicity: {
       type: String,
     },
-    address: {
-      type: String,
-    },
+    address: addressSchema,
     contactNo: {
       type: String,
     },

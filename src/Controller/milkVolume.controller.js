@@ -9,6 +9,10 @@ async function RegisterMilkVolume(req, res) {
   const quantityArray = body.collectedMilk.map((item, index) => {
     return parseInt(item.quantity);
   });
+  const quantityArrayWithRemaining = body?.collectedMilk?.map((item,index)=>{
+    return {...item , remaining:parseInt(item.quantity),quantity:parseInt(item.quantity)}
+  })
+  console.log(quantityArrayWithRemaining)
   const remaining = quantityArray.reduce((acc, value) => acc + value, 0);
   try {
     const isNewDocument = !body._id;
@@ -17,10 +21,11 @@ async function RegisterMilkVolume(req, res) {
           ...body,
           remaining: remaining,
           totalMilkCollected: remaining,
+          collectedMilk:quantityArrayWithRemaining
         })
       : await MilkVolume.findByIdAndUpdate(
           body._id,
-          { ...body, remaining: remaining, totalMilkCollected: remaining },
+          { ...body, remaining: remaining, totalMilkCollected: remaining , collectedMilk:quantityArrayWithRemaining },
           { new: true }
         );
     const savedMilkVolume = await newMilkVolume.save();
