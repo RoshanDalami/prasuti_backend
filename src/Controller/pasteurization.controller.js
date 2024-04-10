@@ -83,14 +83,59 @@ async function createPasteurization(req, res) {
     const body = await req.body;
     const donorList = body?.donorDetailsForPooling;
     let batchName = "";
+    const existingList = await Pasteurization.find({
+      poolingCondition: body.poolingCondition,
+    });
+
+    const lastElement = existingList[existingList.length - 1];
+
     if (body.poolingCondition == 4) {
-      batchName = "CA";
+      if (existingList.length > 0) {
+        const lastChar = lastElement.batchName.charAt(
+          lastElement.batchName.length - 1
+        );
+        const code = lastChar.charCodeAt(0);
+        const sufix = String.fromCharCode(code + 1);
+
+        batchName = `C${sufix}`;
+      } else {
+        batchName = "CA";
+      }
     } else if (body.poolingCondition == 1) {
-      batchName = "EPA";
+      if (existingList.length > 0) {
+        const lastChar = lastElement.batchName.charAt(
+          lastElement.batchName.length - 1
+        );
+        const code = lastChar.charCodeAt(0);
+        const sufix = String.fromCharCode(code + 1);
+
+        batchName = `EP${sufix}`;
+      } else {
+        batchName = "EPA";
+      }
     } else if (body.poolingCondition == 2) {
-      batchName = "PA";
+      if (existingList.length > 0) {
+        const lastChar = lastElement.batchName.charAt(
+          lastElement.batchName.length - 1
+        );
+        const code = lastChar.charCodeAt(0);
+        const sufix = String.fromCharCode(code + 1);
+
+        batchName = `P${sufix}`;
+      } else {
+        batchName = "PA";
+      }
     } else {
-      batchName = "TA";
+      if (existingList.length > 0) {
+        const lastChar = lastElement.batchName.charAt(
+          lastElement.batchName.length - 1
+        );
+        const code = lastChar.charCodeAt(0);
+        const sufix = String.fromCharCode(code + 1);
+        batchName = `T${sufix}`;
+      } else {
+        batchName = "TA";
+      }
     }
     donorList.sort(
       (a, b) => new Date(a.collectedDate) - new Date(b.collectedDate)
@@ -127,7 +172,7 @@ async function createPasteurization(req, res) {
     // }
     for (const item of donorList) {
       const donor = await MilkVolume.findOne({ donorId: item.donorId });
-      console.log(donor,'donor')
+
       if (donor?.remaining < item.volumeOfMilkPooled) {
         throw new Error("Invalid Milk volume");
       }
@@ -145,9 +190,9 @@ async function createPasteurization(req, res) {
       );
       return res.status(201).json(new ApiResponse(200, response, "Success"));
     }
-    // const savedData = await newPooling.save();
-    console.log(newPooling,'response')
-    return res.status(201).json(new ApiResponse(200, newPooling, "Success"));
+    const savedData = await newPooling.save();
+
+    return res.status(201).json(new ApiResponse(200, savedData, "Success"));
   } catch (error) {
     console.log(error);
     return res
