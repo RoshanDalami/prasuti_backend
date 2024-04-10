@@ -5,12 +5,16 @@ const bottleList = new Schema({
     type: String,
     required: true,
   },
+  fiscalYear: {
+    type: Schema.Types.ObjectId,
+    ref: "Fiscal",
+  },
   volume: {
     type: Number,
     required: true,
   },
-  remainingVoluem:{
-    type:Number
+  remainingVoluem: {
+    type: Number,
   },
   expireDate: {
     type: String,
@@ -18,17 +22,17 @@ const bottleList = new Schema({
   },
 
   poolingId: {
-    type:String,
-    required:true
+    type: String,
+    required: true,
   },
   poolingCondition: {
-    type:Number,
-    required:true
+    type: Number,
+    required: true,
   },
-  poolingDate:{
-    type:String,
-    required:true
-  }
+  poolingDate: {
+    type: String,
+    required: true,
+  },
 });
 
 const bottleSchema = new Schema(
@@ -49,9 +53,9 @@ const bottleSchema = new Schema(
       type: Number,
       required: true,
     },
-    poolingDate:{
-      type:String,
-      required:true
+    poolingDate: {
+      type: String,
+      required: true,
     },
 
     bottleList: [bottleList],

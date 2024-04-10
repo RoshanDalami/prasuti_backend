@@ -25,6 +25,10 @@ const milkRequsitionSchema = new Schema(
         type:Schema.Types.ObjectId,
         ref:"BabyDetail"
     },
+    fiscalYear: {
+      type: Schema.Types.ObjectId,
+      ref: "Fiscal",
+    },
     babyName:{
         type:String,
         required:true

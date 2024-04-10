@@ -2,6 +2,7 @@ import { Pasteurization } from "../Model/pasteurization.model.js";
 import { MilkVolume } from "../Model/volumeOfMilk.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { DaanDarta } from "../Model/donorDetails.model.js";
+import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
 async function getColostrum(req, res) {
   try {
     let filteredDonarData = [];
@@ -81,6 +82,8 @@ async function getConditionById(req, res) {
 async function createPasteurization(req, res) {
   try {
     const body = await req.body;
+    const { _id } = await Fiscal.findOne({ status: true });
+
     const donorList = body?.donorDetailsForPooling;
     let batchName = "";
     const existingList = await Pasteurization.find({
@@ -149,6 +152,7 @@ async function createPasteurization(req, res) {
       ...body,
       batchName: batchName,
       expireDate: expireDate,
+      fiscalYear: _id,
     });
 
     // if(savedData){

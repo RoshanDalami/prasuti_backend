@@ -2,9 +2,11 @@ import { BabyDetail } from "../Model/baby.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { MilkRequsition } from "../Model/requistion.model.js";
 import { Gestational } from "../Model/dropdownModels/gestational.model.js";
+import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
 async function createBabyDetail(req, res) {
   try {
     const body = req.body;
+    const { _id } = await Fiscal.findOne({ status: true });
 
     if (!body) {
       return res.status(404).json(new ApiResponse(404, null, "Bad Request"));
@@ -14,6 +16,7 @@ async function createBabyDetail(req, res) {
       ...body,
       milkConsumed: 0,
       milkConsumedToday: 0,
+      fiscalYear: _id,
     });
     const savedBaby = await newBaby.save();
     return res
@@ -53,7 +56,6 @@ async function getBabyDetail(req, res) {
 }
 //getbyId
 async function getBabyDetailId(req, res) {
-
   const { id } = req.params;
 
   let babyList = {};
