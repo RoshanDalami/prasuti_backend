@@ -1,57 +1,65 @@
-import mongoose ,{ Schema } from 'mongoose'
-const babySchema = new Schema({
-    userId:{
-        type: Schema.Types.ObjectId,
-        ref:"User"
+import mongoose, { Schema } from "mongoose";
+const babySchema = new Schema(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
     },
-    babyName:{
-        type:String,
-        required:true
+    fiscalYear: {
+      type: Schema.Types.ObjectId,
+      ref: "Fiscal",
     },
-    dateOfBaby:{
-        type:String,
-        required:[true,'Baby birth date is required']
+    babyName: {
+      type: String,
+      required: true,
     },
-    engDateOfBaby:{
-        type:String,
-        required:[true,'Baby english date is requied']
+    dateOfBaby: {
+      type: String,
+      required: [true, "Baby birth date is required"],
     },
-    gestationalAge:{
-        type:Number,
-        required:[true,'Gestational Age is requied']
+    engDateOfBaby: {
+      type: String,
+      required: [true, "Baby english date is requied"],
     },
-    ipNumber:{
-        type: String,
-        required:[true,'Ip number is required']
+    gestationalAge: {
+      type: Number,
+      required: [true, "Gestational Age is requied"],
     },
-    babyWeight:{
-        type:String,
-        required:[true,'Baby weight is required']
+    ipNumber: {
+      type: String,
+      required: [true, "Ip number is required"],
     },
-    diagnosis:{
-        type:String,
-        required:[true,'Diagnosis recipient is required']
+    babyWeight: {
+      type: String,
+      required: [true, "Baby weight is required"],
     },
-    indications:{
-        type:String,
-        required:[true,"Indications is required"]
+    diagnosis: {
+      type: String,
+      required: [true, "Diagnosis recipient is required"],
     },
-    babyStatus:{
-        type:String,
-        required:true
+    indications: {
+      type: String,
+      required: [true, "Indications is required"],
     },
-    milkConsumed:{
-        type:Number,
-        required:true,
-        default:0
+    babyStatus: {
+      type: String,
+      required: true,
     },
-    milkConsumedToday:{
-        type:Number,
-        required:true,
-        default:0
-    }
-},{timestamps:true})
+    milkConsumed: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    milkConsumedToday: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+  },
+  { timestamps: true }
+);
 
-const BabyDetail = mongoose.models.BabyDetail || mongoose.model('BabyDetail',babySchema)
+const BabyDetail =
+  mongoose.models.BabyDetail || mongoose.model("BabyDetail", babySchema);
 
-export {BabyDetail}
+export { BabyDetail };

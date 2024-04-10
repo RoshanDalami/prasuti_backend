@@ -25,6 +25,10 @@ const pasteurizatonSchema = new Schema(
       type: Number,
       required: true,
     },
+    fiscalYear: {
+      type: Schema.Types.ObjectId,
+      ref: "Fiscal",
+    },
     date: {
       type: String,
       required: true,

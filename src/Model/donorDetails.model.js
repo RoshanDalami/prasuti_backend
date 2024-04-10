@@ -18,19 +18,19 @@ const babyStatusSchema = new mongoose.Schema({
   },
 });
 const addressSchema = new mongoose.Schema({
-  stateId:{
-    type:String,
+  stateId: {
+    type: String,
   },
-  districtId:{
-    type:String,
+  districtId: {
+    type: String,
   },
-  palikaId:{
-    type:String
+  palikaId: {
+    type: String,
   },
-  ward:{
-    type:String
+  ward: {
+    type: String,
   },
-})
+});
 const serologyScreeningSchema = new mongoose.Schema({
   hiv: {
     type: Boolean,
@@ -47,12 +47,12 @@ const serologyScreeningSchema = new mongoose.Schema({
   engDateTest: {
     type: String,
   },
-  dateOfHivTest:{
-    type:String,
+  dateOfHivTest: {
+    type: String,
   },
-  dateofHbsagTest:{
-    type:String
-  }
+  dateofHbsagTest: {
+    type: String,
+  },
 
   // helperName: {
   //   type: String,
@@ -143,6 +143,10 @@ const daanDartaSchema = new Schema(
     },
     engDate: {
       type: String,
+    },
+    fiscalYear: {
+      type: Schema.Types.ObjectId,
+      ref: "Fiscal",
     },
     time: {
       type: String,

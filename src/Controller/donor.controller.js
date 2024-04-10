@@ -1,12 +1,14 @@
 import { DaanDarta } from "../Model/donorDetails.model.js";
 import { District } from "../Model/officeSetupModels/district.model.js";
+import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
 import { Palika } from "../Model/officeSetupModels/palika.model.js";
 import { State } from "../Model/officeSetupModels/state.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 
+export async function RegisterDonor(req, res) {
+  const body = req.body;
+  const { _id } = await Fiscal.findOne({ status: true });
 
-export async function RegisterDonor(req,res){
-    const body =  req.body;
   try {
     const latestDaanDarta = await DaanDarta.findOne(
       {},
@@ -19,18 +21,17 @@ export async function RegisterDonor(req,res){
     // const state = State.findOne({statedId : body?.address?.stateId})
     // const district = District.findOne({districtId:body.address.districtId})
     // const palika = Palika.findOne({palikaId:body.address.palikaId})
-    
 
     if (latestDaanDarta) {
       const lastDonorRegNo = latestDaanDarta.donorRegNo?.split("-")[1];
       const numericPart = parseInt(lastDonorRegNo, 10);
-      newDonorRegNo = 'PMWH-' + (numericPart + 1).toString().padStart(3, "0");
+      newDonorRegNo = "PMWH-" + (numericPart + 1).toString().padStart(3, "0");
     }
 
     let newDaanDarta = new DaanDarta({
-      
       ...body,
       donorRegNo: newDonorRegNo,
+      fiscalYear: _id,
     });
 
     // ===============================================================================================
@@ -55,7 +56,11 @@ export async function RegisterDonor(req,res){
 
     if (newDaanDarta.isSerologyPositive === true) {
       await newDaanDarta.save();
-      return res.status(200).json(new ApiResponse(200,null,"Serology Positive she can't donate milk" ))
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(200, null, "Serology Positive she can't donate milk")
+        );
     }
 
     // ===============================================================================================
@@ -83,7 +88,9 @@ export async function RegisterDonor(req,res){
     if (newDaanDarta.verbalStatus === true) {
       await newDaanDarta.save();
 
-      return res.status(200).json(new ApiResponse(200,null,"she can't donate milk right now !" ))
+      return res
+        .status(200)
+        .json(new ApiResponse(200, null, "she can't donate milk right now !"));
     }
 
     // ===============================================================================================
@@ -103,28 +110,36 @@ export async function RegisterDonor(req,res){
 
     if (newDaanDarta.physicalStatus === true) {
       await newDaanDarta.save();
-      return res.status(200).json(new ApiResponse(200,null,"she can't donate milk right now !" ))
-      
+      return res
+        .status(200)
+        .json(new ApiResponse(200, null, "she can't donate milk right now !"));
     }
 
     // ===============================================================================================	  if (newDaanDarta.serologyRecords.hiv === true) {
     const savedDaanDarta = await newDaanDarta.save();
-    return res.status(200).json(new ApiResponse(200,savedDaanDarta,"Donor Created Successfully"))
-    
+    return res
+      .status(200)
+      .json(new ApiResponse(200, savedDaanDarta, "Donor Created Successfully"));
   } catch (error) {
     console.log(error);
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
-   
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
-export async function GetDonor(req,res){
-    try {
-        const response = await DaanDarta.find({},{__v:0});
-        return res.status(200).json(new ApiResponse(200,response,"Donor List Generated Successfully"))
-        
-    } catch (error) {
-        console.log(error)
-        return res.status(200).json(new ApiResponse(500,null,"Internal Server Error"))
-    }
+export async function GetDonor(req, res) {
+  try {
+    const response = await DaanDarta.find({}, { __v: 0 });
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, response, "Donor List Generated Successfully")
+      );
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(200)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
 }
