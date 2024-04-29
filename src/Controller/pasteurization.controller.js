@@ -174,17 +174,57 @@ async function createPasteurization(req, res) {
     //   });
     // });
     // }
+    for (const item of donorList){
+      const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
+     
+        if (donor?.remaining < item.volumeOfMilkPooled) {
+          throw new Error("Invalid Milk volume");
+        }
+    }
     for (const item of donorList) {
-      const donor = await MilkVolume.findOne({ donorId: item.donorId });
+      const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
+      console.log(donor, "response");
 
-      if (donor?.remaining < item.volumeOfMilkPooled) {
-        throw new Error("Invalid Milk volume");
-      }
-      const newRemaining = donor?.remaining - item.volumeOfMilkPooled;
-      await MilkVolume.findOneAndUpdate(
-        { donorId: item.donorId },
-        { $set: { remaining: newRemaining } }
-      );
+     
+     
+        if (donor?.remaining < item.volumeOfMilkPooled) {
+          throw new Error("Invalid Milk volume");
+        }
+        const newRemaining =
+          donor?.remaining - item.volumeOfMilkPooled;
+        await MilkVolume.findOneAndUpdate(
+          { _id:item?.milkvolumeId },
+          { $set: { remaining: newRemaining } }
+        );
+      
+
+      // try {
+
+      //   await MilkVolume.findOne({donorId:item.donorId}).then((doc)=>{
+      //     const milk = doc.collectedMilk.id(item.milkvolumeId)
+      //     milk.remaining = milk.remaining - item.volumeOfMilkPooled;
+      //     doc.save()
+      //   })
+      // } catch (error) {
+      //   console.log(error)
+      // }
+      // try {
+      //   // Find documents that match the criteria
+      //   const docs = await MilkVolume.find({ donorId: item.donorId });
+
+      //   // Update each document
+      //   for (const doc of docs) {
+      //     const milk = doc.collectedMilk.id(item.milkvolumeId);
+      //     if (milk) {
+      //       milk.remaining -= item.volumeOfMilkPooled;
+      //       await doc.save();
+      //     } else {
+      //       console.error('Milk subdocument not found in document with ID:', doc._id);
+      //     }
+      //   }
+      // } catch (error) {
+      //   console.error('An error occurred:', error);
+      // }
     }
     if (body._id) {
       const response = await Pasteurization.findByIdAndUpdate(
@@ -255,11 +295,52 @@ async function deletePasteurizationById(req, res) {
 
     return res
       .status(200)
-      .json(new ApiResponse(400, response, "Record deleted successfully"));
+      .json(new ApiResponse(200, response, "Record deleted successfully"));
   } catch (error) {
     return res
       .status(500)
       .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+async function getDonorByGestationalAge(req, res) {
+  try {
+    const { gestationalAge } = req.params;
+    const response = await DaanDarta.find({ gestationalAge: gestationalAge });
+    const filterArray = [];
+    for (const donor of response) {
+      const donorId = donor._id;
+      const response = await MilkVolume.findOne({ donorId: donorId });
+      if (response != null) {
+        filterArray.push(response);
+      }
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, filterArray, "List Generated Successfully"));
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+async function updateCulture(req,res){
+  try {
+    
+    
+    const {id,culture} = req.body;
+    if(!id){
+      return res.status(404).json(new ApiResponse(404,null,'Id not found'))
+    }
+    
+    const response = await Pasteurization.findOneAndUpdate({_id:id},{
+      $set:{culture:culture}
+    },{new:true});
+    return res.status(200).json(new ApiResponse(200,response,"Updated Successfully"))
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
   }
 }
 export {
@@ -270,4 +351,6 @@ export {
   getPasteurization,
   getPasteurizationById,
   deletePasteurizationById,
+  getDonorByGestationalAge,
+  updateCulture
 };

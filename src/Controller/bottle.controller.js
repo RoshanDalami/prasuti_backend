@@ -1,6 +1,7 @@
 import { Bottle } from "../Model/bottle.model.js";
 import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { Pasteurization } from '../Model/pasteurization.model.js'
 async function GenerateBottle(req, res) {
   try {
     const {
@@ -13,21 +14,22 @@ async function GenerateBottle(req, res) {
     const { _id } = await Fiscal.findOne({ status: true });
     const totalMilk = totalVolume;
     const bottleSize = 150;
+    const yes = await Pasteurization.findOne({_id:poolingId});
 
     let remainingMilk = totalMilk;
     let bottleNumber = "001";
 
     const bottles = [];
-    let bottleTag = "";
-    if (poolingCondition == 4) {
-      bottleTag = "CA:CA";
-    } else if (poolingCondition == 1) {
-      bottleTag = "EPA:EPA";
-    } else if (poolingCondition == 2) {
-      bottleTag = "PA:PA";
-    } else {
-      bottleTag = "TA:TA";
-    }
+    let bottleTag = `${yes.batchName}:${yes.batchName}` ;
+    // if (poolingCondition == 4) {
+    //   bottleTag = "CA:CA";
+    // } else if (poolingCondition == 1) {
+    //   bottleTag = "EPA:EPA";
+    // } else if (poolingCondition == 2) {
+    //   bottleTag = "PA:PA";
+    // } else {
+    //   bottleTag = "TA:TA";
+    // }
 
     while (remainingMilk >= bottleSize) {
       const bottleName =
@@ -93,7 +95,7 @@ async function GenerateBottle(req, res) {
 async function GetBottle(req, res) {
   try {
     const id = req.params.id;
-    const response = await Bottle.findOne({ poolingId: id });
+    const response = await Bottle.findOne({ poolingId: id});
     return res
       .status(200)
       .json(

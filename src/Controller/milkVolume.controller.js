@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Gestational } from "../Model/dropdownModels/gestational.model.js";
 import { DaanDarta } from "../Model/donorDetails.model.js";
 import { Delivery } from "../Model/dropdownModels/delivery.model.js";
+import {Fiscal} from '../Model/officeSetupModels/fiscal.model.js'
 async function RegisterMilkVolume(req, res) {
   const body = req.body;
   const { _id } = await Fiscal.findOne({ status: true });
@@ -17,7 +18,10 @@ async function RegisterMilkVolume(req, res) {
       quantity: parseInt(item.quantity),
     };
   });
+  
   console.log(quantityArrayWithRemaining);
+  const isDateMatch = await MilkVolume.find({$and:[{donorId:body?.donorId,engDate:body?.engDate}]})
+  console.log(isDateMatch)
   const remaining = quantityArray.reduce((acc, value) => acc + value, 0);
   try {
     const isNewDocument = !body._id;
@@ -115,7 +119,7 @@ async function GetMilkVolumeByGestationalAge(req, res) {
 }
 async function GetMilkVolumeByDonor(req, res) {
   const id = req.params.id;
-  console.log(id, "myid");
+  
   let voluemofMilk = [];
   let donorDetails = {};
   try {
@@ -165,7 +169,17 @@ async function GetMilkVolumeByDonor(req, res) {
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
-
+async function GetMilkListByDonor(req,res){
+  const {donorId} = req.params; 
+try {
+  const response = await MilkVolume.find({donorId:donorId, remaining:{$gt:0}});
+  console.log(response)
+  return res.status(200).json(new ApiResponse(200,response,"List generated according to donorId"))
+} catch (error) {
+  console.log(error);
+  return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+}
+}
 export {
   RegisterMilkVolume,
   GetMilkVolume,
@@ -173,4 +187,5 @@ export {
   GetMilkVolumeByDonor,
   GetMilkById,
   DeleteMilkById,
+  GetMilkListByDonor
 };

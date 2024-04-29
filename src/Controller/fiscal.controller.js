@@ -5,6 +5,9 @@ export async function createFiscal(req, res) {
   try {
     const { fiscalYear, startYear, endYear, startDate, endDate, status } =
       req.body;
+      if(status === true){
+        await Fiscal.updateMany({$set:{status:false}})
+      }
     const newFiscal = new Fiscal({
       fiscalYear,
       startYear,

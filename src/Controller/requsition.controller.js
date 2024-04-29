@@ -21,12 +21,22 @@ async function RegisterMilkRequsition(req, res) {
         .status(200)
         .json(new ApiResponse(200, response, "Milk requsition updated"));
     }
+    const milkList = body?.requisitedMilk;
+    for (const item of milkList){
+      const response = await Bottle.findOne({poolingId:item.batchNumber.split("/")?.[0]});
+      for (const items of response.bottleList){
+        if(items.remainingVoluem < item.quantity){
+          throw new Error("Invalid Milk Volume")
+          
+        }
+      }
+    }
     body?.requisitedMilk?.forEach(async (items) => {
       const poolingId = items.batchNumber.split("/")?.[0];
       const response = await Bottle.findOne({ poolingId: poolingId }).then(
         (doc) => {
           const item = doc.bottleList.id(items.bottleName.split("/")?.[0]);
-          item.remainingVoluem = item.volume - items.quantity;
+          item.remainingVoluem = item.remainingVoluem - items.quantity;
           doc.save();
         }
       );

@@ -7,6 +7,8 @@ import {
   getColostrum,
   getCondition,
   getConditionById,
+  getDonorByGestationalAge,
+  updateCulture
 } from "../Controller/pasteurization.controller.js";
 const pasteurizationRouter = express.Router();
 pasteurizationRouter.route("/getPasteurization").get(getPasteurization);
@@ -19,5 +21,7 @@ pasteurizationRouter
 pasteurizationRouter.route("/getColostrum").get(getColostrum);
 pasteurizationRouter.route("/getCondition").get(getCondition);
 pasteurizationRouter.route("/getConditionById/:id").get(getConditionById);
+pasteurizationRouter.route("/getDonorByGestationalAge/:gestationalAge").get(getDonorByGestationalAge)
+pasteurizationRouter.route("/updateCulture").post(updateCulture)
 
 export { pasteurizationRouter };

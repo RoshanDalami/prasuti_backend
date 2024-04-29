@@ -50,6 +50,11 @@ const pasteurizatonSchema = new Schema(
       type: String,
       required: true,
     },
+    culture:{
+      type:Boolean,
+      default:null
+    }
+
   },
   { timestamps: true }
 );

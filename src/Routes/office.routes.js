@@ -12,19 +12,20 @@ import {
   RegisterEmployee,
   GetEmployee,
 } from "../Controller/office.controller.js";
+import { validateToken } from "../middleware/verify.middleware.js";
 const OfficeRouter = express.Router();
 
-OfficeRouter.route('/registerOffice').post(RegisterOffice);
-OfficeRouter.route('/getOffice').get(GetOffice);
-OfficeRouter.route('/getState').get(GetState);
-OfficeRouter.route('/getPalika').get(GetPalika);
-OfficeRouter.route('/getdistrict').get(GetDistrict);
-OfficeRouter.route('/registerDepartment').post(RegisterDepartment);
-OfficeRouter.route('/getDepartment').get(GetDepartment);
-OfficeRouter.route('/registerPost').post(RegisterPost);
-OfficeRouter.route('/getPost').get(GetPost);
-OfficeRouter.route('/registerEmployee').post(RegisterEmployee);
-OfficeRouter.route('/getEmployee').get(GetEmployee)
+OfficeRouter.route('/registerOffice').post(validateToken,RegisterOffice);
+OfficeRouter.route('/getOffice').get(validateToken,GetOffice);
+OfficeRouter.route('/getState').get(validateToken,GetState);
+OfficeRouter.route('/getPalika').get(validateToken,GetPalika);
+OfficeRouter.route('/getdistrict').get(validateToken,GetDistrict);
+OfficeRouter.route('/registerDepartment').post(validateToken,RegisterDepartment);
+OfficeRouter.route('/getDepartment').get(validateToken,GetDepartment);
+OfficeRouter.route('/registerPost').post(validateToken,RegisterPost);
+OfficeRouter.route('/getPost').get(validateToken,GetPost);
+OfficeRouter.route('/registerEmployee').post(validateToken,RegisterEmployee);
+OfficeRouter.route('/getEmployee').get(validateToken,GetEmployee)
 
 
 
