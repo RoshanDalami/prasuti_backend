@@ -185,8 +185,6 @@ async function createPasteurization(req, res) {
       const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
       console.log(donor, "response");
 
-     
-     
         if (donor?.remaining < item.volumeOfMilkPooled) {
           throw new Error("Invalid Milk volume");
         }

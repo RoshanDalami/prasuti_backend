@@ -42,6 +42,9 @@ const milkRequsitionSchema = new Schema(
       type: String,
       required: true,
     },
+    totalRequisitedMilk:{
+      type:Number
+    },
     requisitedMilk:[requisitedMilk]
   },
   { timestamps: true }

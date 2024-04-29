@@ -61,7 +61,9 @@ async function RegisterMilkVolume(req, res) {
 }
 
 async function GetMilkVolume(req, res) {
+  
   try {
+    const activeFiscal = await Fiscal.findOne({status:true})
     const response = await MilkVolume.find({});
     // .populate(
     //   "donorId",
