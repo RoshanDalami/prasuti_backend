@@ -17,6 +17,10 @@ const CultureSchema = Schema({
         type:String,
         required:true
     },
+    fiscalYear: {
+        type: Schema.Types.ObjectId,
+        ref: "Fiscal",
+      },
     cultureEngDate:{
         type:String,
         required:true

@@ -5,10 +5,7 @@ const bottleList = new Schema({
     type: String,
     required: true,
   },
-  fiscalYear: {
-    type: Schema.Types.ObjectId,
-    ref: "Fiscal",
-  },
+  
   volume: {
     type: Number,
     required: true,
@@ -56,6 +53,10 @@ const bottleSchema = new Schema(
     poolingDate: {
       type: String,
       required: true,
+    },
+    fiscalYear: {
+      type: Schema.Types.ObjectId,
+      ref: "Fiscal",
     },
 
     bottleList: [bottleList],

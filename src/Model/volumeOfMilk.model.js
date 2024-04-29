@@ -2,10 +2,6 @@ import mongoose, { Schema } from "mongoose";
 
 const collectedMilk = new Schema(
   {
-    fiscalYear: {
-      type: Schema.Types.ObjectId,
-      ref: "Fiscal",
-    },
     time: {
       type: String,
       required: true,
@@ -62,6 +58,10 @@ const volumeOfMilkSchema = new Schema(
     totalMilkCollected: {
       type: Number,
       required: true,
+    },
+    fiscalYear: {
+      type: Schema.Types.ObjectId,
+      ref: "Fiscal",
     },
     collectedMilk: [collectedMilk],
   },

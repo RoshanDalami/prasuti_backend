@@ -21,16 +21,16 @@ async function RegisterMilkRequsition(req, res) {
         .status(200)
         .json(new ApiResponse(200, response, "Milk requsition updated"));
     }
-    const milkList = body?.requisitedMilk;
-    for (const item of milkList){
-      const response = await Bottle.findOne({poolingId:item.batchNumber.split("/")?.[0]});
-      for (const items of response.bottleList){
-        if(items.remainingVoluem < item.quantity){
-          throw new Error("Invalid Milk Volume")
+    // const milkList = body?.requisitedMilk;
+    // for (const item of milkList){
+    //   const response = await Bottle.findOne({poolingId:item.batchNumber.split("/")?.[0]});
+    //   for (const items of response.bottleList){
+    //     if(items.remainingVoluem < item.quantity){
+    //       throw new Error("Invalid Milk Volume")
           
-        }
-      }
-    }
+    //     }
+    //   }
+    // }
     body?.requisitedMilk?.forEach(async (items) => {
       const poolingId = items.batchNumber.split("/")?.[0];
       const response = await Bottle.findOne({ poolingId: poolingId }).then(
@@ -48,9 +48,15 @@ async function RegisterMilkRequsition(req, res) {
           return parseInt(item?.quantity);
         })
         .reduce((acc, amount) => acc + amount, 0) + babyDetail?.milkConsumed;
+        const totalRequisitedMilk= body?.requisitedMilk
+        ?.map((item) => {
+          return parseInt(item?.quantity);
+        })
+        .reduce((acc, amount) => acc + amount, 0)
     const newMilkRequsition = new MilkRequsition({
       ...body,
       fiscalYear: fiscalYearId,
+      totalRequisitedMilk: totalRequisitedMilk
     });
     const response = await newMilkRequsition.save();
     await BabyDetail.findOneAndUpdate(
@@ -66,6 +72,7 @@ async function RegisterMilkRequsition(req, res) {
         new ApiResponse(200, body, "Milk requestion registered successfully")
       );
   } catch (error) {
+    console.log(error)
     return res
       .status(500)
       .json(new ApiResponse(500, null, "Internal Server Error"));
