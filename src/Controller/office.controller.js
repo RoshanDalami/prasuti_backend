@@ -166,6 +166,7 @@ async function RegisterPost(req,res){
 async function GetPost(req,res){
     try {
         const response = await Post.find({});
+        
         return res.status(200).json(new ApiResponse(200,response,"Post generated successfully"))
     } catch (error) {
         return res.status(500).json(new ApiResponse(500,null,'Internal Server Error'))
