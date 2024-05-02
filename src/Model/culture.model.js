@@ -33,6 +33,11 @@ const CultureSchema = Schema({
         type:Boolean,
         default:null
     },
+    cultureRemark:{
+        type:String,
+        default:""
+    },
+
     cultureBottleList : [CultureBottleList]
 
 })

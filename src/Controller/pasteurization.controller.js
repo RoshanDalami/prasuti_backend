@@ -87,8 +87,9 @@ async function createPasteurization(req, res) {
     const donorList = body?.donorDetailsForPooling;
     let batchName = "";
     const existingList = await Pasteurization.find({
-      poolingCondition: body.poolingCondition,
+     $and:[{ poolingCondition: body.poolingCondition,date:body.date}],
     });
+    console.log(existingList)
 
     const lastElement = existingList[existingList.length - 1];
 

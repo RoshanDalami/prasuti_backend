@@ -19,8 +19,8 @@ async function RegisterMilkVolume(req, res) {
     };
   });
   
-  console.log(quantityArrayWithRemaining);
-  const isDateMatch = await MilkVolume.find({$and:[{donorId:body?.donorId,engDate:body?.engDate}]})
+  
+  const isDateMatch = await MilkVolume.find({$and:[{donorId:body?.donorId,date:body?.date}]})
   console.log(isDateMatch)
   const remaining = quantityArray.reduce((acc, value) => acc + value, 0);
   try {
