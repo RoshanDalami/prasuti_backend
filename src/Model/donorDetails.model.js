@@ -8,7 +8,7 @@ const babyStatusSchema = new mongoose.Schema({
     type: String,
   },
   babyStatus: {
-    type: Number,
+    type: [String],
   },
   babyTransfer: {
     type: Number,

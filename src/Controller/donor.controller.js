@@ -4,7 +4,9 @@ import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
 import { Palika } from "../Model/officeSetupModels/palika.model.js";
 import { State } from "../Model/officeSetupModels/state.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+import { Gestational } from "../Model/dropdownModels/gestational.model.js";
+import { Parity } from "../Model/dropdownModels/parity.model.js";
+import { Delivery } from "../Model/dropdownModels/delivery.model.js";
 export async function RegisterDonor(req, res) {
   const body = req.body;
   const { _id } = await Fiscal.findOne({ status: true });
@@ -130,7 +132,55 @@ export async function RegisterDonor(req, res) {
 
 export async function GetDonor(req, res) {
   try {
-    const response = await DaanDarta.find({}, { __v: 0 });
+    const response = await DaanDarta.find({ isDonorActive: true }, { __v: 0 });
+    const newArray = await Promise.all(
+      response?.map(async (item) => {
+        try {
+          const gestational = await Gestational.findOne({
+            gestationalId: item.gestationalAge,
+          });
+          const gestationalName = gestational?.gestationalName;
+          const delivery = await Delivery.findOne({
+            deliveryId: item.modeOfDelivery,
+          });
+          const deliveryName = delivery?.deliveryName;
+          const parity = await Parity.findOne({ parityId: item.parity })
+          console.log(parity,'parityByid')
+          const parityName = parity?.parityName;
+          return {
+            ...item.toObject(),
+            gestationalName: gestationalName,
+            deliveryName: deliveryName,
+            parityName: parityName,
+          };
+        } catch (error) {
+          console.error("Error while fetching department:", error);
+          // Return a default object or null if department lookup fails
+          return {
+            ...item.toObject(),
+            gestationalName: null,
+            deliveryName: null,
+            parityName: null,
+          };
+        }
+      })
+    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, newArray, "Donor List Generated Successfully")
+      );
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(200)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+
+export async function GetInActiveDonor(req, res) {
+  try {
+    const response = await DaanDarta.find({ isDonorActive: false }, { __v: 0 });
     return res
       .status(200)
       .json(
@@ -140,6 +190,25 @@ export async function GetDonor(req, res) {
     console.log(error);
     return res
       .status(200)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+
+export async function DataForExcel(req, res) {
+  try {
+    const response = await DaanDarta.find(
+      {},
+      { __v: 0, createdAt: 0, updatedAt: 0 }
+    );
+    const newArray = response?.map((item) => {
+      return {
+        ...item,
+      };
+    });
+    return res.status(200).json(new ApiResponse(200, response, "List"));
+  } catch (error) {
+    return res
+      .status(500)
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
