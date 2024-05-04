@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 
 const CultureBottleList = Schema({
    
-    bottleId:{
+    batchId:{
         type:String,
         required:true
     },
