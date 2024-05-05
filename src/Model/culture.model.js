@@ -25,10 +25,6 @@ const CultureSchema = Schema({
         type:String,
         required:true
     },
-    batchId:{
-        type:String,
-        required:true
-    },
     cultureResult:{
         type:Boolean,
         default:null
