@@ -3,29 +3,27 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Pasteurization } from "../Model/pasteurization.model.js";
 async function createCulture(req, res) {
   try {
-    const { cultureBottleList, batchId, cultureDate, cultureEngDate } =
-      req.body;
+    const { cultureBottleList, cultureDate, cultureEngDate } = req.body;
     let cultureResult;
-    cultureBottleList?.forEach((item) => {
+    cultureBottleList?.forEach(async (item) => {
       if (item.cultureResult == "true") {
-        cultureResult = true;
+        //   cultureResult = true;
+        // } else {
+        //   cultureResult = false;
+        // }
+
+        await Pasteurization.findOneAndUpdate(
+          { _id: item.batchId },
+          { $set: { culture: true } }
+        );
       } else {
-        cultureResult = false;
+        await Pasteurization.findOneAndUpdate(
+          { _id: item.batchId },
+          { $set: { culture: false }}
+        );
       }
     });
-    if (cultureResult) {
-      await Pasteurization.findOneAndUpdate(
-        { _id: batchId },
-        { $set: { culture: true } }
-      );
-    } else {
-      await Pasteurization.findOneAndUpdate(
-        { _id: batchId },
-        { $set: { culture: false } }
-      );
-    }
     const newCulter = await new Culter({
-      batchId,
       cultureDate,
       cultureEngDate,
       cultureResult: cultureResult,

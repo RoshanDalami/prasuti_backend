@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 
 const CultureBottleList = Schema({
    
-    bottleId:{
+    batchId:{
         type:String,
         required:true
     },
@@ -22,10 +22,6 @@ const CultureSchema = Schema({
         ref: "Fiscal",
       },
     cultureEngDate:{
-        type:String,
-        required:true
-    },
-    batchId:{
         type:String,
         required:true
     },
