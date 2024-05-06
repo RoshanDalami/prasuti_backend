@@ -266,6 +266,26 @@ async function GetEmployee(req, res) {
   }
 }
 
+async function EmployeeActiveDeactive(req,res){
+  try {
+    const {id}= req.params;
+    const individualEmployee = await Employee.findOne({_id:id});
+    if(individualEmployee?.isActive === true){
+      const response = await Employee.findOneAndUpdate({_id:id},{
+        $set:{isActive:false}
+      },{new : true})
+      return res.status(200).json(new ApiResponse(200,response,"Employee updated successfully"))
+    } else{
+      const response = await Employee.findOneAndUpdate({_id:id},{
+        $set:{isActive:true}
+      },{new : true})
+      return res.status(200).json(new ApiResponse(200,response,"Employee updated successfully"))
+    }
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
+
 export {
   RegisterOffice,
   GetOffice,
@@ -278,4 +298,5 @@ export {
   GetPost,
   RegisterEmployee,
   GetEmployee,
+  EmployeeActiveDeactive
 };

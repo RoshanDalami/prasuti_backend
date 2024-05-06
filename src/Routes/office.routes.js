@@ -11,6 +11,7 @@ import {
   GetPost,
   RegisterEmployee,
   GetEmployee,
+  EmployeeActiveDeactive
 } from "../Controller/office.controller.js";
 import { validateToken } from "../middleware/verify.middleware.js";
 const OfficeRouter = express.Router();
@@ -26,6 +27,7 @@ OfficeRouter.route('/registerPost').post(RegisterPost);
 OfficeRouter.route('/getPost').get(GetPost);
 OfficeRouter.route('/registerEmployee').post(RegisterEmployee);
 OfficeRouter.route('/getEmployee').get(GetEmployee)
+OfficeRouter.route('/employeeStatus/:id').get(EmployeeActiveDeactive)
 
 
 
