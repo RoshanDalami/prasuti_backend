@@ -25,6 +25,8 @@ async function getColostrum(req, res) {
         }
       }
     }
+    // const response = await MilkVolume.find({isColostrum:true});
+
     return res
       .status(200)
       .json(
@@ -185,15 +187,18 @@ async function createPasteurization(req, res) {
     for (const item of donorList) {
       const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
       console.log(donor, "response");
-
+        let colostrum 
         if (donor?.remaining < item.volumeOfMilkPooled) {
           throw new Error("Invalid Milk volume");
         }
         const newRemaining =
           donor?.remaining - item.volumeOfMilkPooled;
+          if(newRemaining <= 0){
+            colostrum = false;
+          }
         await MilkVolume.findOneAndUpdate(
           { _id:item?.milkvolumeId },
-          { $set: { remaining: newRemaining } }
+          { $set: { remaining: newRemaining ,  } }
         );
       
 
@@ -301,6 +306,29 @@ async function deletePasteurizationById(req, res) {
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
+async function getDonorWithTotalMilk(req,res){
+  try {
+    const { gestationalAge } = req.params;
+    const response = await DaanDarta.find({ });
+    const filterArray = [];
+    for (const donor of response) {
+      const donorId = donor._id;
+      const response = await MilkVolume.findOne({ donorId: donorId });
+      if (response != null) {
+        filterArray.push(response);
+      }
+    }
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, filterArray, "List Generated Successfully"));
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
 async function getDonorByGestationalAge(req, res) {
   try {
     const { gestationalAge } = req.params;
@@ -351,5 +379,6 @@ export {
   getPasteurizationById,
   deletePasteurizationById,
   getDonorByGestationalAge,
-  updateCulture
+  updateCulture,
+  getDonorWithTotalMilk
 };

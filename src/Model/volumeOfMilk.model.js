@@ -59,6 +59,9 @@ const volumeOfMilkSchema = new Schema(
       type: Number,
       required: true,
     },
+    isColostrum:{
+      type:Boolean
+    },
     fiscalYear: {
       type: Schema.Types.ObjectId,
       ref: "Fiscal",

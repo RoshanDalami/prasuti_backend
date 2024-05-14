@@ -7,7 +7,8 @@ import {
   GetMilkVolumeByDonor,
   GetMilkById,
   DeleteMilkById,
-  GetMilkListByDonor
+  GetMilkListByDonor,
+  getDonorWithTotalMilk
 } from "../Controller/milkVolume.controller.js";
 const MilkVolumeRoute = express.Router();
 MilkVolumeRoute.route('/registerMilkVolume').post(RegisterMilkVolume);
@@ -17,5 +18,6 @@ MilkVolumeRoute.route('/getMilkVolumeByDonor/:id').get(GetMilkVolumeByDonor)
 MilkVolumeRoute.route('/getMilkById/:id').get(GetMilkById)
 MilkVolumeRoute.route('/deleteMilkById/:id').delete(DeleteMilkById)
 MilkVolumeRoute.route('/volumeByDonorId/:donorId').get(GetMilkListByDonor)
+MilkVolumeRoute.route('/donorWithTotalVolume').get(getDonorWithTotalMilk)
 export { MilkVolumeRoute };
 

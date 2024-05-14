@@ -6,6 +6,9 @@ import { Palika } from "../Model/officeSetupModels/palika.model.js";
 import { Post } from "../Model/officeSetupModels/post.model.js";
 import { State } from "../Model/officeSetupModels/state.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import User from "../Model/user.model.js";
+import bcryptjs from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 async function RegisterOffice(req, res) {
   try {
@@ -243,7 +246,20 @@ async function RegisterEmployee(req, res) {
       employeePhone,
       employeeId,
     });
-    await newEmployee.save();
+   const success = await newEmployee.save();
+   if(success){
+    let password = employeeName.split(' ')[0]+'@123'
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    const newUser = new User({
+        username:employeeName,
+        email:employeeEmail.trim(),
+        contactNo:employeePhone,
+        password: hashedPassword,
+        confirmPassword: null,
+        role:"employee"
+      });
+      await newUser.save();
+   }
     return res
       .status(200)
       .json(new ApiResponse(200, newEmployee, "Employee Created Successfully"));
