@@ -28,6 +28,11 @@ const employeeSchema = new Schema({
     employeePhone:{
         type:String,
         required:true
+    },
+    isActive:{
+        type:Boolean,
+        required:true,
+        default:true
     }
 
 },{timestamps:true})

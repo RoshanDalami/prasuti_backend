@@ -6,6 +6,9 @@ import { Palika } from "../Model/officeSetupModels/palika.model.js";
 import { Post } from "../Model/officeSetupModels/post.model.js";
 import { State } from "../Model/officeSetupModels/state.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import User from "../Model/user.model.js";
+import bcryptjs from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 async function RegisterOffice(req, res) {
   try {
@@ -243,7 +246,20 @@ async function RegisterEmployee(req, res) {
       employeePhone,
       employeeId,
     });
-    await newEmployee.save();
+   const success = await newEmployee.save();
+   if(success){
+    let password = employeeName.split(' ')[0]+'@123'
+    const hashedPassword = await bcryptjs.hash(password, 10);
+    const newUser = new User({
+        username:employeeName,
+        email:employeeEmail.trim(),
+        contactNo:employeePhone,
+        password: hashedPassword,
+        confirmPassword: null,
+        role:"employee"
+      });
+      await newUser.save();
+   }
     return res
       .status(200)
       .json(new ApiResponse(200, newEmployee, "Employee Created Successfully"));
@@ -266,6 +282,26 @@ async function GetEmployee(req, res) {
   }
 }
 
+async function EmployeeActiveDeactive(req,res){
+  try {
+    const {id}= req.params;
+    const individualEmployee = await Employee.findOne({_id:id});
+    if(individualEmployee?.isActive === true){
+      const response = await Employee.findOneAndUpdate({_id:id},{
+        $set:{isActive:false}
+      },{new : true})
+      return res.status(200).json(new ApiResponse(200,response,"Employee updated successfully"))
+    } else{
+      const response = await Employee.findOneAndUpdate({_id:id},{
+        $set:{isActive:true}
+      },{new : true})
+      return res.status(200).json(new ApiResponse(200,response,"Employee updated successfully"))
+    }
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
+
 export {
   RegisterOffice,
   GetOffice,
@@ -278,4 +314,5 @@ export {
   GetPost,
   RegisterEmployee,
   GetEmployee,
+  EmployeeActiveDeactive
 };

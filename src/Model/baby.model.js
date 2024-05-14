@@ -34,11 +34,11 @@ const babySchema = new Schema(
       required: [true, "Baby weight is required"],
     },
     diagnosis: {
-      type: String,
+      type: [String],
       required: [true, "Diagnosis recipient is required"],
     },
     indications: {
-      type: String,
+      type: [String],
       required: [true, "Indications is required"],
     },
     babyStatus: {

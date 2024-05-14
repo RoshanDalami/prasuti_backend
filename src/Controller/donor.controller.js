@@ -212,3 +212,20 @@ export async function DataForExcel(req, res) {
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
+
+export async function UpdateDonorStatus(req,res){
+  try {
+    const {id} = req.params;
+    const previousData = await DaanDarta.findOne({_id:id});
+    const previousStatus = previousData?.isDonorActive
+    const response = await DaanDarta.findOneAndUpdate({_id:id},{
+      $set:{
+        isDonorActive: !previousStatus
+      }
+    },{new:true});
+    return res.status(200).json(new ApiResponse(200,response,"Donor updated successfully"))
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
