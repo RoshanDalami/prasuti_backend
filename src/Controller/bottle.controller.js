@@ -13,7 +13,7 @@ async function GenerateBottle(req, res) {
     } = req.body;
     const { _id } = await Fiscal.findOne({ status: true });
     const totalMilk = totalVolume;
-    const bottleSize = 150;
+    const bottleSize = 140;
     const yes = await Pasteurization.findOne({_id:poolingId});
 
     let remainingMilk = totalMilk;
