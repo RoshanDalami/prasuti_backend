@@ -1,5 +1,11 @@
 import mongoose,{Schema} from 'mongoose';
 
+
+const moduleAccessSchema = new Schema({
+    title:{
+        type:String,
+    }
+})
 const userSchema = new Schema({
     username:{
         type:String,
@@ -20,7 +26,8 @@ const userSchema = new Schema({
     role:{
         type:String,
         required:true
-    }
+    },
+    assignedModule:[moduleAccessSchema]
 },{timestamps:true})
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);

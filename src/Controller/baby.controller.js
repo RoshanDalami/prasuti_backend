@@ -47,7 +47,7 @@ async function getBabyDetail(req, res) {
 
     return res
       .status(200)
-      .json(new ApiResponse(200, response, "Internal Server Error"));
+      .json(new ApiResponse(200, response, "Baby details generated successfully"));
   } catch (error) {
     return res
       .status(500)

@@ -222,6 +222,8 @@ async function RegisterEmployee(req, res) {
     employeeName,
     employeeEmail,
     employeePhone,
+    password,
+    createUser
   } = req.body;
 
   try {
@@ -247,8 +249,11 @@ async function RegisterEmployee(req, res) {
       employeeId,
     });
    const success = await newEmployee.save();
-   if(success){
-    let password = employeeName.split(' ')[0]+'@123'
+   if(createUser){
+    const user = await User.findOne({email:employeeEmail});
+    if(user){
+      return res.status(200).json(new ApiResponse(200,null,"User already exist with this email"))
+    }
     const hashedPassword = await bcryptjs.hash(password, 10);
     const newUser = new User({
         username:employeeName,
