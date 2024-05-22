@@ -15,7 +15,6 @@ const collectedMilk = new Schema(
     },
     temp: {
       type: Number,
-      required: true,
     },
     storedBy: {
       type: String,
@@ -59,8 +58,8 @@ const volumeOfMilkSchema = new Schema(
       type: Number,
       required: true,
     },
-    isColostrum:{
-      type:Boolean
+    isColostrum: {
+      type: Boolean,
     },
     fiscalYear: {
       type: Schema.Types.ObjectId,
