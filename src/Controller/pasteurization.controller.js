@@ -329,29 +329,88 @@ async function getDonorWithTotalMilk(req,res){
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
+// async function getDonorByGestationalAge(req, res) {
+//   try {
+//     const { gestationalAge } = req.params;
+//     const response = await DaanDarta.find({ gestationalAge: gestationalAge });
+//     const filterArray = [];
+//     for (const donor of response) {
+//       const donorId = donor._id;
+//       const response = await MilkVolume.findOne({ donorId: donorId });
+//       if (response != null) {
+//         filterArray.push(response);
+//       }
+//     }
+
+//     return res
+//       .status(200)
+//       .json(new ApiResponse(200, filterArray, "List Generated Successfully"));
+//   } catch (error) {
+//     console.log(error);
+//     return res
+//       .status(500)
+//       .json(new ApiResponse(500, null, "Internal Server Error"));
+//   }
+// }
+//gpt version
 async function getDonorByGestationalAge(req, res) {
   try {
     const { gestationalAge } = req.params;
-    const response = await DaanDarta.find({ gestationalAge: gestationalAge });
-    const filterArray = [];
-    for (const donor of response) {
-      const donorId = donor._id;
-      const response = await MilkVolume.findOne({ donorId: donorId });
-      if (response != null) {
-        filterArray.push(response);
-      }
-    }
+    const donors = await DaanDarta.find({ gestationalAge: gestationalAge });
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, filterArray, "List Generated Successfully"));
+    // Use Promise.all to handle all async operations concurrently
+    const filterArray = await Promise.all(donors.map(async (donor) => {
+      try {
+        // Aggregation pipeline to sum up the 'remaining' field for each donorId
+        const response = await MilkVolume.aggregate([
+          { $match: { donorId: donor._id } },
+          {
+            $group: {
+              _id: "$donorId",
+              remaining: { $sum: "$remaining" },
+              totalMilkCollected :{$sum:"$totalMilkCollected"}
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              donorId: "$_id",
+              remaining: 1,
+              totalMilkCollected:1
+            }
+          }
+        ]);
+
+        // Check if response is not empty and return required fields
+        if (response.length > 0) {
+          return {
+            donorId: response[0].donorId,
+            remaining: response[0].remaining,
+            totalMilkCollected:response[0].totalMilkCollected,
+            donorName: donor.donorName // Assuming donor.name contains the donorName
+          };
+        }
+
+        return null;
+      } catch (error) {
+        console.error(`Failed to fetch milk volume for donorId ${donor._id}`, error);
+        return null; // Handle the error by returning null
+      }
+    }));
+
+    // Filter out null values from the results
+    const validResponses = filterArray.filter(response => response !== null);
+
+    return res.status(200).json(new ApiResponse(200, validResponses, "List Generated Successfully"));
   } catch (error) {
-    console.log(error);
-    return res
-      .status(500)
-      .json(new ApiResponse(500, null, "Internal Server Error"));
+    console.error(error);
+    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
+
+
+
+
 async function updateCulture(req,res){
   try {
     
