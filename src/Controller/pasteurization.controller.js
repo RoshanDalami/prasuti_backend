@@ -91,7 +91,6 @@ async function createPasteurization(req, res) {
     const existingList = await Pasteurization.find({
      $and:[{ poolingCondition: body.poolingCondition,date:body.date}],
     });
-    console.log(existingList)
 
     const lastElement = existingList[existingList.length - 1];
 
@@ -143,12 +142,14 @@ async function createPasteurization(req, res) {
         batchName = "TA";
       }
     }
+    console.log(donorList)
     donorList.sort(
       (a, b) => new Date(a.collectedDate) - new Date(b.collectedDate)
     );
     const currentDate = new Date(donorList[0].collectedDate);
     let expireDate = new Date(currentDate);
     expireDate.setMonth(currentDate?.getMonth() + 6);
+    console.log(expireDate)
     expireDate = JSON.stringify(expireDate).split("T")[0].slice(1);
 
     const newPooling = new Pasteurization({
@@ -186,7 +187,6 @@ async function createPasteurization(req, res) {
     }
     for (const item of donorList) {
       const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
-      console.log(donor, "response");
         let colostrum 
         if (donor?.remaining < item.volumeOfMilkPooled) {
           throw new Error("Invalid Milk volume");
@@ -376,7 +376,8 @@ async function getDonorByGestationalAge(req, res) {
               _id: 0,
               donorId: "$_id",
               remaining: 1,
-              totalMilkCollected:1
+              totalMilkCollected:1,
+              date: { $arrayElemAt: ["$dates", 0] }
             }
           }
         ]);
@@ -387,7 +388,8 @@ async function getDonorByGestationalAge(req, res) {
             donorId: response[0].donorId,
             remaining: response[0].remaining,
             totalMilkCollected:response[0].totalMilkCollected,
-            donorName: donor.donorName // Assuming donor.name contains the donorName
+            donorName: donor.donorName,
+            date: response[0].date  // Assuming donor.name contains the donorName
           };
         }
 
@@ -413,19 +415,48 @@ async function getDonorByGestationalAge(req, res) {
 
 async function updateCulture(req,res){
   try {
-    
-    
-    const {id,culture} = req.body;
+    const {id,culture,cultureDate} = req.body;
+    let discard
+    if(culture == 'true'){
+      discard = true
+    }else{
+      discard = false
+    }
     if(!id){
       return res.status(404).json(new ApiResponse(404,null,'Id not found'))
     }
-    
     const response = await Pasteurization.findOneAndUpdate({_id:id},{
-      $set:{culture:culture}
+      $set:{culture:culture,discard:discard,cultureDate:cultureDate}
     },{new:true});
     return res.status(200).json(new ApiResponse(200,response,"Updated Successfully"))
   } catch (error) {
     console.log(error)
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
+
+async function updateOtherStatus(req,res){
+  try {
+    const {id,other,feededToBaby,otherTestDate} = req.body;
+    let discard ;
+    if(other == 'true'){
+      discard = true
+    }else{
+      discard = false
+    }
+    const response = await Pasteurization.findOneAndUpdate({_id:id},{
+      $set:{
+        other: other,
+        feededToBaby:feededToBaby,
+        otherTestDate:otherTestDate,
+        culture:discard,
+        discard:discard
+      }
+    },{new:true});
+    
+    return res.status(200).json(new ApiResponse(200,response,"Other status updated successfully"))
+  } catch (error) {
+    console.log(error);
     return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
   }
 }
@@ -439,5 +470,6 @@ export {
   deletePasteurizationById,
   getDonorByGestationalAge,
   updateCulture,
-  getDonorWithTotalMilk
+  getDonorWithTotalMilk,
+  updateOtherStatus
 };
