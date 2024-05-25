@@ -8,7 +8,8 @@ import {
   getCondition,
   getConditionById,
   getDonorByGestationalAge,
-  updateCulture
+  updateCulture,
+  updateOtherStatus
 } from "../Controller/pasteurization.controller.js";
 const pasteurizationRouter = express.Router();
 pasteurizationRouter.route("/getPasteurization").get(getPasteurization);
@@ -23,5 +24,6 @@ pasteurizationRouter.route("/getCondition").get(getCondition);
 pasteurizationRouter.route("/getConditionById/:id").get(getConditionById);
 pasteurizationRouter.route("/getDonorByGestationalAge/:gestationalAge").get(getDonorByGestationalAge)
 pasteurizationRouter.route("/updateCulture").post(updateCulture)
+pasteurizationRouter.route('/updateOther').post(updateOtherStatus)
 
 export { pasteurizationRouter };

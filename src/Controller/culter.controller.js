@@ -14,12 +14,12 @@ async function createCulture(req, res) {
 
         await Pasteurization.findOneAndUpdate(
           { _id: item.batchId },
-          { $set: { culture: true } }
+          { $set: { culture: true , discard:true ,cultureDate:cultureDate} }
         );
       } else {
         await Pasteurization.findOneAndUpdate(
           { _id: item.batchId },
-          { $set: { culture: false }}
+          { $set: { culture: false,cultureDate:cultureDate }}
         );
       }
     });

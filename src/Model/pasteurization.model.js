@@ -53,6 +53,23 @@ const pasteurizatonSchema = new Schema(
     culture:{
       type:Boolean,
       default:null
+    },
+    other:{
+      type:Boolean,
+      default:null
+    },
+    feededToBaby:{
+      type:Boolean,
+      default:false
+    },
+    otherTestDate:{
+      type:String
+    },
+    discard:{
+      type:Boolean
+    },
+    cultureDate:{
+      type:String
     }
 
   },
