@@ -389,6 +389,7 @@ async function getDonorByGestationalAge(req, res) {
             remaining: response[0].remaining,
             totalMilkCollected:response[0].totalMilkCollected,
             donorName: donor.donorName,
+            hosRegNo: donor.hosRegNo,
             date: response[0].date  // Assuming donor.name contains the donorName
           };
         }
@@ -439,24 +440,31 @@ async function updateOtherStatus(req,res){
   try {
     const {id,other,feededToBaby,otherTestDate} = req.body;
     let discard ;
-    if(other == 'true'){
-      discard = true
-    }else{
-      discard = false
-    }
+  
     const response = await Pasteurization.findOneAndUpdate({_id:id},{
       $set:{
         other: other,
         feededToBaby:feededToBaby,
         otherTestDate:otherTestDate,
-        culture:discard,
-        discard:discard
       }
     },{new:true});
     
     return res.status(200).json(new ApiResponse(200,response,"Other status updated successfully"))
   } catch (error) {
     console.log(error);
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
+async function discard(req,res){
+  try {
+    const {id} = req.params;
+    const response = await Pasteurization.findOneAndUpdate({_id:id},{
+      $set:{
+        discard:true
+      }
+    })
+    return res.status(200).json(new ApiResponse(200,response,'Discarded successfully'))
+  } catch (error) {
     return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
   }
 }
@@ -471,5 +479,6 @@ export {
   getDonorByGestationalAge,
   updateCulture,
   getDonorWithTotalMilk,
-  updateOtherStatus
+  updateOtherStatus,
+  discard
 };

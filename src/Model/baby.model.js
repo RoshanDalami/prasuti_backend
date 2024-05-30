@@ -55,6 +55,10 @@ const babySchema = new Schema(
       required: true,
       default: 0,
     },
+    status:{
+      type:Boolean,
+      default : true
+    }
   },
   { timestamps: true }
 );

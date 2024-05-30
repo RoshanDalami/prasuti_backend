@@ -229,3 +229,58 @@ export async function UpdateDonorStatus(req,res){
     return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
   }
 }
+
+export async function UpdateDonorOtherTest(req,res){
+  try {
+    const { id, other } = req.body;
+
+    // Validate ID
+  
+
+    // Find and update the document
+    const response = await DaanDarta.findOneAndUpdate(
+      { _id: id },
+      { $push: { other: { $each: other } } },
+      { new: true, runValidators: true ,upsert:true}
+    );
+
+    // Check if document was found and updated
+    if (!response) {
+      return res.status(404).json(new ApiResponse(404, null, "Document not found"));
+    }
+
+    return res.status(200).json(new ApiResponse(200, response, "Update successful"));
+  } catch (error) {
+    console.error('Error updating document:', error);
+    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+
+export async function getDonorOtherTest(req,res){
+  try {
+    const {id} = req.params;
+    const response = await DaanDarta.findOne({_id:id})
+    const otherTests = response?.other
+    return res.status(200).json(new ApiResponse(200,otherTests,"Other test Generated successfully"))
+  } catch (error) {
+    return res.status(500).json(500,null,"Internal Server Error")
+  }
+}
+
+export async function discard(req,res){
+  try {
+    const {id,discardDate} = req.body;
+    const response = await DaanDarta.findOneAndUpdate({_id:id},{
+      $set:{
+        discard:true,
+        isDonorActive:false,
+        discardDate:discardDate
+
+      }
+    })
+    return res.status(200).json(new ApiResponse(200,response,'Discarded successfully'))
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
+
