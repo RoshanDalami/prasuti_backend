@@ -18,7 +18,7 @@ export async function RegisterDonor(req, res) {
       { sort: { donorRegNo: -1 } }
     );
 
-    let newDonorRegNo = "PMWH-001";
+    let newDonorRegNo = "PMWH-1412";
 
     // const state = State.findOne({statedId : body?.address?.stateId})
     // const district = District.findOne({districtId:body.address.districtId})
