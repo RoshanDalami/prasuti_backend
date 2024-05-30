@@ -17,6 +17,17 @@ const babyStatusSchema = new mongoose.Schema({
     type: Number,
   },
 });
+const otherSchema = new Schema({
+  testName:{
+    type:String
+  },
+  testResult:{
+    type:Boolean
+  },
+  testDate:{
+    type:String
+  }
+})
 const addressSchema = new mongoose.Schema({
   stateId: {
     type: String,
@@ -207,6 +218,13 @@ const daanDartaSchema = new Schema(
     serologyRecords: serologyScreeningSchema,
     verbalExamination: verbalExaminationSchema,
     donorPhysicalExamination: donorPhysicalExaminationSchema,
+    other:[otherSchema],
+    discard:{
+      type:Boolean
+    },
+    discardDate:{
+      type:String
+    }
   },
   { timestamps: true }
 );

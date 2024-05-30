@@ -101,4 +101,26 @@ async function getBabyDetailId(req, res) {
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
-export { createBabyDetail, getBabyDetail, getBabyDetailId };
+
+async function updateBabyStatus (req,res){
+  try {
+    const {id} = req.params;
+    const getBaby = await BabyDetail.findOne({_id:id});
+    if(!getBaby) return res.status(400).json(new ApiResponse(400,null,"No baby exist with this id"))
+    let status 
+    if(getBaby){
+      status = getBaby?.status;
+    }
+    console.log(getBaby?.status)
+    const resposne = await BabyDetail.findOneAndUpdate({_id:id},{
+      $set:{
+        status: !getBaby?.status
+      }
+    })
+    return res.status(200).json(new ApiResponse(200,resposne,"status updated"))
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json(new ApiResponse(500,null,"Internal  Server Error"))
+  }
+}
+export { createBabyDetail, getBabyDetail, getBabyDetailId,updateBabyStatus };

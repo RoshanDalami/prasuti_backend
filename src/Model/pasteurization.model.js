@@ -14,7 +14,16 @@ const donorDetailsForPooling = new Schema(
   },
   { timestamps: true }
 );
+const otherSchema = new Schema({
+  testName:{
+    type:String
+  },
+  testResult:{
+    type:Boolean
+  },
 
+
+})
 const pasteurizatonSchema = new Schema(
   {
     userId: {
@@ -54,10 +63,7 @@ const pasteurizatonSchema = new Schema(
       type:Boolean,
       default:null
     },
-    other:{
-      type:Boolean,
-      default:null
-    },
+    other:[otherSchema],
     feededToBaby:{
       type:Boolean,
       default:false
