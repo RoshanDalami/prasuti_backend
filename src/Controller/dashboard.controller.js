@@ -346,6 +346,52 @@ async function GetMilkRequsitionMonthly(req, res) {
   }
 }
 
+async function GetRegisteredDonorMonthly(req,res){
+  try {
+    const response = await DaanDarta.find({isDonorActive:true});
+    const bai = response.filter((item)=>item.date.split("-")[1] === "01" ).length
+    console.log(bai)
+  const jestha = response.filter((item)=>item.date.split("-")[1] === "02" ).length
+  const ashad = response.filter((item)=>item.date.split("-")[1] === "03" ).length
+   
+  const sarwan = response.filter((item)=>item.date.split("-")[1] === "04" ).length
+    
+  const bhadra = response.filter((item)=>item.date.split("-")[1] === "05" ).length
+    
+  const ashoj = response.filter((item)=>item.date.split("-")[1] === "06" ).length
+    
+  const kartik = response.filter((item)=>item.date.split("-")[1] === "07" ).length
+
+  const mangsir = response.filter((item)=>item.date.split("-")[1] === "08" ).length
+    
+  const poush = response.filter((item)=>item.date.split("-")[1] === "09" ).length
+    
+  const magh = response.filter((item)=>item.date.split("-")[1] === "10" ).length
+   
+  const falgun = response.filter((item)=>item.date.split("-")[1] === "11" ).length
+  
+  const cahitra = response.filter((item)=>item.date.split("-")[1] === "12" ).length
+  const newArray = [
+    bai,
+    jestha,
+    ashad,
+    sarwan,
+    bhadra,
+    ashoj,
+    kartik,
+    mangsir,
+    poush,
+    magh,
+    falgun,
+    cahitra,
+  ];
+
+  return res.status(200).json(new ApiResponse(200,newArray,))
+     
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
 
 
 export {
@@ -355,4 +401,5 @@ export {
   GetTotalRequsition,
   GetMilkCollectedMonthly,
   GetMilkRequsitionMonthly,
+  GetRegisteredDonorMonthly
 };

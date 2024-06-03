@@ -224,6 +224,9 @@ const daanDartaSchema = new Schema(
     },
     discardDate:{
       type:String
+    },
+    donorRegisteredDate :{
+      type:String
     }
   },
   { timestamps: true }

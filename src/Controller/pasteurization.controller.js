@@ -146,8 +146,8 @@ async function createPasteurization(req, res) {
     donorList.sort(
       (a, b) => new Date(a.collectedDate) - new Date(b.collectedDate)
     );
-    const currentDate = new Date(donorList[0].collectedDate);
-    let expireDate = new Date(currentDate);
+    // const currentDate = new Date(donorList[0].collectedDate);
+    let expireDate = new Date(body.date);
     expireDate.setMonth(currentDate?.getMonth() + 6);
     console.log(expireDate)
     expireDate = JSON.stringify(expireDate).split("T")[0].slice(1);
