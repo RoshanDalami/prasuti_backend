@@ -7,8 +7,8 @@ import { Post } from "../Model/officeSetupModels/post.model.js";
 import { State } from "../Model/officeSetupModels/state.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import User from "../Model/user.model.js";
-import bcryptjs from 'bcryptjs'
-import jwt from 'jsonwebtoken'
+import bcryptjs from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 async function RegisterOffice(req, res) {
   try {
@@ -47,6 +47,7 @@ async function RegisterOffice(req, res) {
         .status(400)
         .json(new ApiResponse(400, null, "Fields are required"));
     }
+
     const newOffice = new Office({
       office_name,
       office_code,
@@ -120,7 +121,7 @@ async function GetPalika(req, res) {
 }
 async function RegisterDepartment(req, res) {
   try {
-    const { userId, departmentName, officeId } = req.body;
+    const { userId, departmentName, officeId, id } = req.body;
 
     let departmentId = 1;
     const latestDepartment = await Department.findOne(
@@ -131,6 +132,25 @@ async function RegisterDepartment(req, res) {
     if (latestDepartment) {
       const latestDepartmentId = latestDepartment.departmentId;
       departmentId = latestDepartmentId + 1;
+    }
+
+    if (id) {
+      const response = await Department.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            userId: userId,
+            departmentName: departmentName,
+            officeId: officeId,
+            departmentId: departmentId,
+          },
+        }
+      );
+      return res
+        .status(200)
+        .json(
+          new ApiResponse(200, response, "Department updated successfully")
+        );
     }
     const newDepartment = new Department({
       userId,
@@ -162,14 +182,43 @@ async function GetDepartment(req, res) {
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
+async function GetDepartmentById(req, res) {
+  try {
+    const { id } = req.params;
+    const response = await Department.findOne({ _id: id });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "DepartmentById"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
 async function RegisterPost(req, res) {
-  const { userId, postName, departmentId } = req.body;
+  const { userId, postName, departmentId, id } = req.body;
   try {
     let postId = 1;
     const latestPost = await Post.findOne({}, {}, { sort: { postId: -1 } });
     if (latestPost) {
       const latestPostId = latestPost?.postId;
       postId = latestPostId + 1;
+    }
+    if (id) {
+      const response = await Post.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            userId: userId,
+            postName: postName,
+            departmentId: departmentId,
+          },
+        },
+        { new: true }
+      );
+      return res
+        .status(200)
+        .json(new ApiResponse(200, response, "Post updated successfully"));
     }
     const newPost = new Post({
       userId,
@@ -223,10 +272,12 @@ async function RegisterEmployee(req, res) {
     employeeEmail,
     employeePhone,
     password,
-    createUser
+    createUser,
+    id,
   } = req.body;
 
   try {
+    
     let employeeId = parseInt(1, 10);
     const latestEmployee = await Employee.findOne(
       {},
@@ -239,6 +290,36 @@ async function RegisterEmployee(req, res) {
 
       employeeId = latestEmployeeId + 1;
     }
+    if (id) {
+      const response = await Employee.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: {
+            userId: userId,
+            departmentId: departmentId,
+            postId: postId,
+            employeeName: employeeName,
+            employeeEmail: employeeEmail,
+            employeePhone: employeePhone,
+          },
+        }
+      );
+      return res.status(200).json(new ApiResponse(200,response,"employee updated successfully"))
+    }
+    const employeeExist = await Employee.findOne({
+      $and: [{ employeeEmail: employeeEmail, employeePhone: employeePhone }],
+    });
+    if (employeeExist) {
+      return res
+        .status(400)
+        .json(
+          new ApiResponse(
+            400,
+            null,
+            "Employee with same email and contact number already exist"
+          )
+        );
+    }
     const newEmployee = new Employee({
       userId,
       departmentId,
@@ -248,23 +329,27 @@ async function RegisterEmployee(req, res) {
       employeePhone,
       employeeId,
     });
-   const success = await newEmployee.save();
-   if(createUser){
-    const user = await User.findOne({email:employeeEmail});
-    if(user){
-      return res.status(200).json(new ApiResponse(200,null,"User already exist with this email"))
-    }
-    const hashedPassword = await bcryptjs.hash(password, 10);
-    const newUser = new User({
-        username:employeeName,
-        email:employeeEmail.trim(),
-        contactNo:employeePhone,
+    const success = await newEmployee.save();
+    if (createUser) {
+      const user = await User.findOne({ email: employeeEmail });
+      if (user) {
+        return res
+          .status(200)
+          .json(
+            new ApiResponse(200, null, "User already exist with this email")
+          );
+      }
+      const hashedPassword = await bcryptjs.hash(password, 10);
+      const newUser = new User({
+        username: employeeName,
+        email: employeeEmail.trim(),
+        contactNo: employeePhone,
         password: hashedPassword,
         confirmPassword: null,
-        role:"employee"
+        role: "employee",
       });
       await newUser.save();
-   }
+    }
     return res
       .status(200)
       .json(new ApiResponse(200, newEmployee, "Employee Created Successfully"));
@@ -287,23 +372,61 @@ async function GetEmployee(req, res) {
   }
 }
 
-async function EmployeeActiveDeactive(req,res){
+async function EmployeeActiveDeactive(req, res) {
   try {
-    const {id}= req.params;
-    const individualEmployee = await Employee.findOne({_id:id});
-    if(individualEmployee?.isActive === true){
-      const response = await Employee.findOneAndUpdate({_id:id},{
-        $set:{isActive:false}
-      },{new : true})
-      return res.status(200).json(new ApiResponse(200,response,"Employee updated successfully"))
-    } else{
-      const response = await Employee.findOneAndUpdate({_id:id},{
-        $set:{isActive:true}
-      },{new : true})
-      return res.status(200).json(new ApiResponse(200,response,"Employee updated successfully"))
+    const { id } = req.params;
+    const individualEmployee = await Employee.findOne({ _id: id });
+    if (individualEmployee?.isActive === true) {
+      const response = await Employee.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: { isActive: false },
+        },
+        { new: true }
+      );
+      return res
+        .status(200)
+        .json(new ApiResponse(200, response, "Employee updated successfully"));
+    } else {
+      const response = await Employee.findOneAndUpdate(
+        { _id: id },
+        {
+          $set: { isActive: true },
+        },
+        { new: true }
+      );
+      return res
+        .status(200)
+        .json(new ApiResponse(200, response, "Employee updated successfully"));
     }
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+async function GetPostById(req, res) {
+  try {
+    const { id } = req.params;
+    const response = await Post.findOne({ _id: id });
+    return res.status(200).json(new ApiResponse(200, response, "Post By id"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+async function GetEmployeeById(req, res) {
+  try {
+    const { id } = req.params;
+    const response = await Employee.findOne({ _id: id });
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "data fetched successfully"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
@@ -319,5 +442,8 @@ export {
   GetPost,
   RegisterEmployee,
   GetEmployee,
-  EmployeeActiveDeactive
+  EmployeeActiveDeactive,
+  GetDepartmentById,
+  GetPostById,
+  GetEmployeeById
 };

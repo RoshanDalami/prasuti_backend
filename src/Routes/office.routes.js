@@ -11,7 +11,10 @@ import {
   GetPost,
   RegisterEmployee,
   GetEmployee,
-  EmployeeActiveDeactive
+  EmployeeActiveDeactive,
+  GetDepartmentById,
+  GetEmployeeById,
+  GetPostById
 } from "../Controller/office.controller.js";
 import { validateToken } from "../middleware/verify.middleware.js";
 const OfficeRouter = express.Router();
@@ -28,7 +31,9 @@ OfficeRouter.route('/getPost').get(GetPost);
 OfficeRouter.route('/registerEmployee').post(RegisterEmployee);
 OfficeRouter.route('/getEmployee').get(GetEmployee)
 OfficeRouter.route('/employeeStatus/:id').get(EmployeeActiveDeactive)
-
+OfficeRouter.route("/departmentById/:id").get(GetDepartmentById);
+OfficeRouter.route("/employeeById/:id").get(GetEmployeeById)
+OfficeRouter.route("/postById/:id").get(GetPostById)
 
 
 export { OfficeRouter };
