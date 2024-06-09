@@ -349,28 +349,28 @@ async function GetMilkRequsitionMonthly(req, res) {
 async function GetRegisteredDonorMonthly(req,res){
   try {
     const response = await DaanDarta.find({isDonorActive:true});
-    const bai = response.filter((item)=>item.date.split("-")[1] === "01" ).length
+    const bai = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "01" ).length
     console.log(bai)
-  const jestha = response.filter((item)=>item.date.split("-")[1] === "02" ).length
-  const ashad = response.filter((item)=>item.date.split("-")[1] === "03" ).length
+  const jestha = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "02" ).length
+  const ashad = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "03" ).length
    
-  const sarwan = response.filter((item)=>item.date.split("-")[1] === "04" ).length
+  const sarwan = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "04" ).length
     
-  const bhadra = response.filter((item)=>item.date.split("-")[1] === "05" ).length
+  const bhadra = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "05" ).length
     
-  const ashoj = response.filter((item)=>item.date.split("-")[1] === "06" ).length
+  const ashoj = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "06" ).length
     
-  const kartik = response.filter((item)=>item.date.split("-")[1] === "07" ).length
+  const kartik = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "07" ).length
 
-  const mangsir = response.filter((item)=>item.date.split("-")[1] === "08" ).length
+  const mangsir = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "08" ).length
     
-  const poush = response.filter((item)=>item.date.split("-")[1] === "09" ).length
+  const poush = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "09" ).length
     
-  const magh = response.filter((item)=>item.date.split("-")[1] === "10" ).length
+  const magh = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "10" ).length
    
-  const falgun = response.filter((item)=>item.date.split("-")[1] === "11" ).length
+  const falgun = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "11" ).length
   
-  const cahitra = response.filter((item)=>item.date.split("-")[1] === "12" ).length
+  const cahitra = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "12" ).length
   const newArray = [
     bai,
     jestha,
