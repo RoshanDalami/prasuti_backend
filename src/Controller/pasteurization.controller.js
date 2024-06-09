@@ -390,6 +390,7 @@ async function getDonorByGestationalAge(req, res) {
             totalMilkCollected:response[0].totalMilkCollected,
             donorName: donor.donorName,
             hosRegNo: donor.hosRegNo,
+            donorRegNo:donor.donorRegNo,
             date: response[0].date  // Assuming donor.name contains the donorName
           };
         }
