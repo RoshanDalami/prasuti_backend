@@ -284,3 +284,13 @@ export async function discard(req,res){
   }
 }
 
+export async function UpdateDonorRegDate(req,res){
+  try {
+    await DaanDarta.updateMany({},{$set:{
+      donorRegisteredDate:"2080-02-13"
+    }})
+    return res.status(200).json(new ApiResponse(200,'success','updaetd'))
+  } catch (error) {
+  return res.status(500).json(new ApiResponse(500,null,"Internal Server error"))  
+  }
+}
