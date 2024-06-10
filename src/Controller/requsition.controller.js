@@ -21,26 +21,24 @@ async function RegisterMilkRequsition(req, res) {
         .status(200)
         .json(new ApiResponse(200, response, "Milk requsition updated"));
     }
-    // const milkList = body?.requisitedMilk;
-    // for (const item of milkList){
-    //   const response = await Bottle.findOne({poolingId:item.batchNumber.split("/")?.[0]});
-    //   for (const items of response.bottleList){
-    //     if(items.remainingVoluem < item.quantity){
-    //       throw new Error("Invalid Milk Volume")
-          
-    //     }
-    //   }
-    // }
-    body?.requisitedMilk?.forEach(async (items) => {
-      const poolingId = items.batchNumber.split("/")?.[0];
-      const response = await Bottle.findOne({ poolingId: poolingId }).then(
-        (doc) => {
+    console.log(body?.requisitedMilk)
+       // Update bottle quantities sequentiallys
+       for (const items of body?.requisitedMilk || []) {
+        const poolingId = items.batchNumber.split("/")?.[0];
+        const doc = await Bottle.findOne({ poolingId: poolingId }).exec();
+        if (doc) {
           const item = doc.bottleList.id(items.bottleName.split("/")?.[0]);
-          item.remainingVoluem = item.remainingVoluem - items.quantity;
-          doc.save();
+          if (item) {
+            item.remainingVoluem = item.remainingVoluem - items.quantity;
+            await doc.save();
+          } else {
+            console.error(`Bottle with name ${items.bottleName.split("/")?.[0]} not found in document with poolingId ${poolingId}`);
+          }
+        } else {
+          console.error(`Document with poolingId ${poolingId} not found`);
         }
-      );
-    });
+      }
+  
     const babyDetail = await BabyDetail.findOne({ _id: body?.babyId });
     const consumnedMilk =
       body?.requisitedMilk
@@ -48,15 +46,15 @@ async function RegisterMilkRequsition(req, res) {
           return parseInt(item?.quantity);
         })
         .reduce((acc, amount) => acc + amount, 0) + babyDetail?.milkConsumed;
-        const totalRequisitedMilk= body?.requisitedMilk
-        ?.map((item) => {
-          return parseInt(item?.quantity);
-        })
-        .reduce((acc, amount) => acc + amount, 0)
+    const totalRequisitedMilk = body?.requisitedMilk
+      ?.map((item) => {
+        return parseInt(item?.quantity);
+      })
+      .reduce((acc, amount) => acc + amount, 0);
     const newMilkRequsition = new MilkRequsition({
       ...body,
       fiscalYear: fiscalYearId,
-      totalRequisitedMilk: totalRequisitedMilk
+      totalRequisitedMilk: totalRequisitedMilk,
     });
     const response = await newMilkRequsition.save();
     await BabyDetail.findOneAndUpdate(
@@ -72,7 +70,7 @@ async function RegisterMilkRequsition(req, res) {
         new ApiResponse(200, body, "Milk requestion registered successfully")
       );
   } catch (error) {
-    console.log(error)
+    console.log(error);
     return res
       .status(500)
       .json(new ApiResponse(500, null, "Internal Server Error"));
