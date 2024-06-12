@@ -22,7 +22,7 @@ const babySchema = new Schema(
       required: [true, "Baby english date is requied"],
     },
     gestationalAge: {
-      type: Number,
+      type: String,
       required: [true, "Gestational Age is requied"],
     },
     ipNumber: {
@@ -58,6 +58,12 @@ const babySchema = new Schema(
     status:{
       type:Boolean,
       default : true
+    },
+    gender:{
+      type:String
+    },
+    parity:{
+      type:String
     }
   },
   { timestamps: true }
