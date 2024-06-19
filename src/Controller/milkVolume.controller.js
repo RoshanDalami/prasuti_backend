@@ -20,15 +20,15 @@ async function RegisterMilkVolume(req, res) {
   });
 
   const donor = await DaanDarta.findOne({ _id: body?.donorId });
-  console.log(donor)
+  console.log(donor);
   let colostrum;
   const currentDate = new Date();
   const dob = new Date(donor.babyStatus.engDateBirth);
   const diffTime = Math.abs(currentDate - dob);
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  if(diffDays <=3){
+  if (diffDays <= 3) {
     colostrum = true;
-  }else{
+  } else {
     colostrum = false;
   }
 
@@ -42,7 +42,7 @@ async function RegisterMilkVolume(req, res) {
           totalMilkCollected: remaining,
           collectedMilk: quantityArrayWithRemaining,
           fiscalYear: _id,
-          isColostrum:colostrum,
+          isColostrum: colostrum,
         })
       : await MilkVolume.findByIdAndUpdate(
           body._id,
@@ -231,6 +231,8 @@ async function GetMilkVolumeByDonor(req, res) {
         donorAge: individual?.donorAge,
         address: individual?.address,
         contactNo: individual?.contactNo,
+        gestationalAge:individual?.gestationalAge,
+        hosRegNo:individual?.hosRegNo,
         modeOfDelivery: modeName,
         donotedMilkList: [],
       };
@@ -246,6 +248,8 @@ async function GetMilkVolumeByDonor(req, res) {
         donorAge: individual?.donorAge,
         address: individual?.address,
         contactNo: individual?.contactNo,
+        gestationalAge:individual?.gestationalAge,
+        hosRegNo:individual?.hosRegNo,
         modeOfDelivery: modeName,
         donotedMilkList: voluemofMilk,
       };
@@ -283,24 +287,26 @@ async function GetMilkListByDonor(req, res) {
 
 async function getDonorWithTotalMilk(req, res) {
   try {
-    const response = await MilkVolume.find({});
-    const totalMilkCollectedByUserId = {};
+    // Fetch all entries from MilkVolume
+    const milkVolumes = await MilkVolume.find({});
+    
+    // Create a set of unique donorIds
+    const donorIds = [...new Set(milkVolumes.map(entry => entry.donorId))];
+    
+    // Fetch donor details from DaanDarta
+    const donors = await DaanDarta.find({});
+    
 
-    response.forEach((entry) => {
-      const userId = entry.donorId; // Assuming donorId represents userId
-
-      // If userId already exists in the object, add milk collected to its total
-      if (totalMilkCollectedByUserId[userId]) {
-        totalMilkCollectedByUserId[userId] += entry.totalMilkCollected;
-      } else {
-        // If userId doesn't exist, initialize it with the milk collected
-        totalMilkCollectedByUserId[userId] = entry.totalMilkCollected;
-      }
-    });
-
-    // Create an array of objects with userId and totalMilkCollected
-    const resultArray = response.reduce((acc, entry) => {
+    // Create a map for quick lookup of donor details
+    const donorDetailsMap = donors.reduce((acc, donor) => {
+      acc[donor._id] = donor;
+      return acc;
+    }, {});
+console.log(donorDetailsMap)
+    // Calculate total milk collected by each donor and include donor details
+    const totalMilkCollectedByUserId = milkVolumes.reduce((acc, entry) => {
       const userId = entry.donorId;
+
       if (!acc[userId]) {
         acc[userId] = {
           _id: entry._id,
@@ -308,20 +314,22 @@ async function getDonorWithTotalMilk(req, res) {
           donorId: userId,
           donorName: entry.donorName,
           totalMilkCollected: entry.totalMilkCollected,
+          hosRegNo: donorDetailsMap[userId]?.hosRegNo,
+          donorRegNo: donorDetailsMap[userId]?.donorRegNo,
         };
       } else {
         acc[userId].totalMilkCollected += entry.totalMilkCollected;
       }
+      
       return acc;
     }, {});
 
-    const finalResultArray = Object.values(resultArray);
+    // Convert the result object to an array
+    const finalResultArray = Object.values(totalMilkCollectedByUserId);
 
     return res
       .status(200)
-      .json(
-        new ApiResponse(200, finalResultArray, "Data generated successfully")
-      );
+      .json(new ApiResponse(200, finalResultArray, "Data generated successfully"));
   } catch (error) {
     console.log(error);
     return res

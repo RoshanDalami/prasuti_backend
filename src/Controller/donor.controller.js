@@ -294,3 +294,20 @@ export async function UpdateDonorRegDate(req,res){
   return res.status(500).json(new ApiResponse(500,null,"Internal Server error"))  
   }
 }
+
+export async function getDonorByGestationalAge(req,res){
+  try {
+    const {id} = req.params;
+    if(!id){
+      return res.status(400).json(new ApiResponse(400,null,"id not found"))
+    }
+    const response = await DaanDarta.find({gestationalAge:id});
+    if(!response){
+      return res.status(400).json(new ApiResponse(400,null,"Data not found"));
+    }
+    return res.status(200).json(new ApiResponse(200,response,'Donor generated according to Gestational Age.'))
+    
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,'Internal Server Error'))
+  }
+}
