@@ -3,6 +3,7 @@ import { MilkVolume } from "../Model/volumeOfMilk.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { DaanDarta } from "../Model/donorDetails.model.js";
 import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
+import { Bottle } from '../Model/bottle.model.js'
 async function getColostrum(req, res) {
   try {
     let filteredDonarData = [];
@@ -255,18 +256,30 @@ async function getPasteurization(req, res) {
       {},
       { __v: 0, createdAt: 0, updatedAt: 0 }
     );
+
     if (!response) {
       return res
         .status(405)
         .json(new ApiResponse(405, null, "List generation failed"));
     }
 
+    // Map response to array of promises and use Promise.all to wait for all to resolve
+    const newResponse = await Promise.all(response.map(async (item) => {
+      const bottle = await Bottle.findOne({ poolingId: item._id });
+      const remainingOnBottle = bottle?.bottleList?.map((bottleItem) => bottleItem.remainingVoluem)?.reduce((acc, amt) => acc + amt, 0);
+      return {
+        ...item.toObject(), // Convert Mongoose document to plain object
+        remaining: remainingOnBottle
+      };
+    }));
+
+    console.log(newResponse);
     return res
       .status(201)
-      .json(new ApiResponse(200, response, "List generated Successfully"));
+      .json(new ApiResponse(200, newResponse, "List generated Successfully"));
   } catch (error) {
     console.log(error);
-    return res.status(500).json(new ApiResponse(500, "Internal Server Error"));
+    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 //getbyId

@@ -70,13 +70,15 @@ async function getBabyDetailId(req, res) {
     if (response.length <= 0) {
       babyList = {
         babyName: individual?.babyName,
+        ipNumber:individual?.ipNumber,
         dateOfBaby: individual?.dateOfBaby,
         engDateOfBaby: individual?.engDateOfBaby,
-        gestationalAge: gestationalName,
+        gestationalAge: individual?.gestationalAge,
         babyWeight: individual?.babyWeight,
         milkComsumedDetail: [],
       };
     }
+
     response.forEach((items) => {
       const array = items.requisitedMilk.map((item, index) => {
         return { ...item._doc, feedingDate: items.feedingDate };
@@ -85,8 +87,9 @@ async function getBabyDetailId(req, res) {
       babyList = {
         babyName: individual?.babyName,
         dateOfBaby: individual?.dateOfBaby,
+        ipNumber:individual?.ipNumber,
         engDateOfBaby: individual?.engDateOfBaby,
-        gestationalAge: gestationalName,
+        gestationalAge: individual?.gestationalAge,
         babyWeight: individual?.babyWeight,
         milkComsumedDetail: feedList,
       };
