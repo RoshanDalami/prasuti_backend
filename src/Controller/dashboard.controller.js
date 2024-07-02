@@ -457,6 +457,15 @@ async function GetDashboardNumber(req,res){
 
     const unPasturizedMilk = totalMilkCollected - collectedMilk ;
     const  pasturizedRemaining = collectedMilk - totalDispense;
+    const baby = await BabyDetail.find( 
+       
+      {
+        $and :[ {milkConsumed:{
+          $gt:0
+        }},{status:true}]
+       });
+    
+    const feededBaby = baby.length;
 
     const result = [
       {
@@ -466,17 +475,23 @@ async function GetDashboardNumber(req,res){
         units:''
       },
       {
-        title:"Recipient Records",
+        title:"Total Baby",
         recordAmount:totalBaby,
         imageName:"/assets/images/newborn.png",
         units:''
       },
       {
-        title:"Milk Requsition",
-        recordAmount:totalMilkRequ,
-        imageName:"/assets/images/record.png",
-        units:'ml'
+        title:"Recipient Records",
+        recordAmount:feededBaby,
+        imageName:"/assets/images/newborn.png",
+        units:''
       },
+      // {
+      //   title:"Milk Requsition",
+      //   recordAmount:totalMilkRequ,
+      //   imageName:"/assets/images/record.png",
+      //   units:'ml'
+      // },
       {
         title:"Milk Collection",
         recordAmount:totalMilkCollected,
