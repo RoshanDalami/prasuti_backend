@@ -3,6 +3,7 @@ import { BabyDetail } from "../Model/baby.model.js";
 import { MilkVolume } from "../Model/volumeOfMilk.model.js";
 import { DaanDarta } from "../Model/donorDetails.model.js";
 import { MilkRequsition } from "../Model/requistion.model.js";
+import { Pasteurization } from '../Model/pasteurization.model.js'
 import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
 async function GetTotalBaby(req, res) {
   try {
@@ -392,7 +393,127 @@ async function GetRegisteredDonorMonthly(req,res){
     return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
   }
 }
+async function GetTotalPasturizedMilk(req,res){
+  try {
+    const response = await Pasteurization.find({culture:false});
+    const collectedMilk =  response?.map((item)=>{
+      
+        return item?.collectedVolume
+    })?.reduce((acc,amt)=>acc+amt,0);
+    console.log(collectedMilk)
+    return res.status(200).json(new ApiResponse(200,collectedMilk,'Total Pasturized milk'))
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
 
+async function GetTotalDispensedMilk(req,res){
+  try {
+    const response = await BabyDetail.find({});
+    const totalDispense = response?.map((item)=> item.milkConsumed)?.reduce((acc,amt)=>acc+amt,0);
+    console.log(totalDispense);
+    return res.status(200).json(new ApiResponse(200,totalDispense,"Total Dispense"))
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"));
+  }
+}
+
+async function GetDashboardNumber(req,res){
+  try {
+
+    // baby details
+    const response = await BabyDetail.find({});
+    const totalBaby = response.length;
+    //donor 
+    const responseDonor = await DaanDarta.find({ isDonorActive: true });
+    const totalDonor = responseDonor?.length;
+
+    //milk volume
+    const responseMilkVolume = await MilkVolume.find({});
+    const newArray = responseMilkVolume?.map((item) => {
+      return item.totalMilkCollected;
+    });
+    const totalMilkCollected = newArray.reduce(
+      (acc, amount) => acc + amount,
+      0
+    );
+    //milk requsition
+    let array = [];
+    const responseMilkRequsition = await MilkRequsition.find({});
+    responseMilkRequsition.forEach((item) => {
+      const newArray = item.requisitedMilk?.map((x) => x.quantity);
+      array.push(...newArray);
+    });
+    const totalMilkRequ = array?.reduce((acc, amt) => acc + amt, 0);
+    //total pasturization
+    const responsePast = await Pasteurization.find({culture:false});
+    const collectedMilk =  responsePast?.map((item)=>{
+      
+        return item?.collectedVolume
+    })?.reduce((acc,amt)=>acc+amt,0);
+    //total dispense
+    const responseDispense = await BabyDetail.find({});
+    const totalDispense = responseDispense?.map((item)=> item.milkConsumed)?.reduce((acc,amt)=>acc+amt,0);
+
+    const unPasturizedMilk = totalMilkCollected - collectedMilk ;
+    const  pasturizedRemaining = collectedMilk - totalDispense;
+
+    const result = [
+      {
+        title:"Donor Records",
+        recordAmount:totalDonor,
+        imageName:"/assets/images/mother.png",
+        units:''
+      },
+      {
+        title:"Recipient Records",
+        recordAmount:totalBaby,
+        imageName:"/assets/images/newborn.png",
+        units:''
+      },
+      {
+        title:"Milk Requsition",
+        recordAmount:totalMilkRequ,
+        imageName:"/assets/images/record.png",
+        units:'ml'
+      },
+      {
+        title:"Milk Collection",
+        recordAmount:totalMilkCollected,
+        imageName:"/assets/images/feeding-bottle.png",
+        units:'ml'
+      },
+      {
+        title:"Total Pasturized Milk",
+        recordAmount:collectedMilk,
+        imageName:"/assets/images/feeding-bottle.png",
+        units:'ml'
+      },
+      {
+        title:"Pasturized Remaining Milk",
+        recordAmount:pasturizedRemaining,
+        imageName:"/assets/images/feeding-bottle.png",
+        units:'ml'
+      },
+      {
+        title:"Unpasturized Remaining Milk",
+        recordAmount:unPasturizedMilk,
+        imageName:"/assets/images/feeding-bottle.png",
+        units:'ml'
+      },
+      {
+        title:"Total Milk Dispensed",
+        recordAmount:totalDispense,
+        imageName:"/assets/images/feeding-bottle.png",
+        units:'ml'
+      },
+
+    ]
+    return res.status(200).json(new ApiResponse(200,result,"REsult"))
+  } catch (error) {
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+  }
+}
 
 export {
   GetTotalBaby,
@@ -401,5 +522,8 @@ export {
   GetTotalRequsition,
   GetMilkCollectedMonthly,
   GetMilkRequsitionMonthly,
-  GetRegisteredDonorMonthly
+  GetRegisteredDonorMonthly,
+  GetTotalPasturizedMilk,
+  GetTotalDispensedMilk,
+  GetDashboardNumber
 };

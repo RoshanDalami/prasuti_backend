@@ -7,6 +7,9 @@ import {
   GetMilkCollectedMonthly,
   GetMilkRequsitionMonthly,
   GetRegisteredDonorMonthly,
+  GetTotalPasturizedMilk,
+  GetTotalDispensedMilk,
+  GetDashboardNumber
 } from "../Controller/dashboard.controller.js";
 
 const DashboardRouter = express.Router();
@@ -22,5 +25,7 @@ DashboardRouter.route("/getMilkRequsitionMonthWise").get(
   GetMilkRequsitionMonthly
 );
 DashboardRouter.route("/getDonorCountMonthly").get(GetRegisteredDonorMonthly);
-
+DashboardRouter.route("/getTotalPasturizedMilk").get(GetTotalPasturizedMilk);
+DashboardRouter.route("/getTotalDispenseMilk").get(GetTotalDispensedMilk);
+DashboardRouter.route("/getAllRecords").get(GetDashboardNumber);
 export { DashboardRouter };
