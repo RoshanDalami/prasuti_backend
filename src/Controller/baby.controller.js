@@ -31,7 +31,7 @@ async function createBabyDetail(req, res) {
 //get
 async function getBabyDetail(req, res) {
   try {
-    const response = await BabyDetail.find({}, { __v: 0 });
+    const response = await BabyDetail.find({status:true}, { __v: 0 });
     const milkDetail = [];
     const array = await Promise.all(
       response.map(async (items) => {
