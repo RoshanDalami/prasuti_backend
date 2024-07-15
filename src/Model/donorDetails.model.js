@@ -146,7 +146,6 @@ const daanDartaSchema = new Schema(
     },
     donorRegNo: {
       type: String,
-      unique: true,
       required: true,
     },
     date: {
