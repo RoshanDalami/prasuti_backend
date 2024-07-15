@@ -7,18 +7,31 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Gestational } from "../Model/dropdownModels/gestational.model.js";
 import { Parity } from "../Model/dropdownModels/parity.model.js";
 import { Delivery } from "../Model/dropdownModels/delivery.model.js";
+import mongoose from "mongoose";
+
+
+// Function to get the current fiscal year
+async function getCurrentFiscalYear() {
+  return await Fiscal.findOne({ status: true });
+}
+
+// Function to get the previous fiscal year
+async function getPreviousFiscalYear(currentFiscalYear) {
+  return await Fiscal.findOne({ startYear: currentFiscalYear.startYear - 1 });
+}
+
 export async function RegisterDonor(req, res) {
   const body = req.body;
   const { _id } = await Fiscal.findOne({ status: true });
 
   try {
     const latestDaanDarta = await DaanDarta.findOne(
-      {},
+      {$and:[{isDonorActive:true,fiscalYear:_id}]},
       {},
       { sort: { donorRegNo: -1 } }
     );
-
-    let newDonorRegNo = "PMWH-1412";
+    console.log(latestDaanDarta)
+    let newDonorRegNo = "PMWH-0001";
 
     // const state = State.findOne({statedId : body?.address?.stateId})
     // const district = District.findOne({districtId:body.address.districtId})
@@ -130,34 +143,88 @@ export async function RegisterDonor(req, res) {
   }
 }
 
+// export async function GetDonor(req, res) {
+
+//   try {
+//     const fiscalYear = await Fiscal.findOne({status:true});
+
+//     const response = await DaanDarta.find({ $and:[{isDonorActive: true },{fiscalYear:fiscalYear._id}]}, { __v: 0 });
+//     const newArray = await Promise.all(
+//       response?.map(async (item) => {
+//         try {
+//           const gestational = await Gestational.findOne({
+//             gestationalId: item.gestationalAge,
+//           });
+//           const gestationalName = gestational?.gestationalName;
+//           const delivery = await Delivery.findOne({
+//             deliveryId: item.modeOfDelivery,
+//           });
+//           const deliveryName = delivery?.deliveryName;
+//           const parity = await Parity.findOne({ parityId: item.parity })
+//           console.log(parity,'parityByid')
+//           const parityName = parity?.parityName;
+//           return {
+//             ...item.toObject(),
+//             gestationalName: gestationalName,
+//             deliveryName: deliveryName,
+//             parityName: parityName,
+//           };
+//         } catch (error) {
+//           console.error("Error while fetching department:", error);
+//           // Return a default object or null if department lookup fails
+//           return {
+//             ...item.toObject(),
+//             gestationalName: null,
+//             deliveryName: null,
+//             parityName: null,
+//           };
+//         }
+//       })
+//     );
+//     return res
+//       .status(200)
+//       .json(
+//         new ApiResponse(200, newArray, "Donor List Generated Successfully")
+//       );
+//   } catch (error) {
+//     console.log(error);
+//     return res
+//       .status(200)
+//       .json(new ApiResponse(500, null, "Internal Server Error"));
+//   }
+// }
 export async function GetDonor(req, res) {
   try {
-    const response = await DaanDarta.find({ isDonorActive: true }, { __v: 0 });
-    const newArray = await Promise.all(
-      response?.map(async (item) => {
+    const fiscalYear = await Fiscal.findOne({ status: true });
+
+    if (!fiscalYear) {
+      return res.status(400).json(new ApiResponse(400, null, "No active fiscal year found"));
+    }
+
+    const donors = await DaanDarta.find(
+      { isDonorActive: true},
+      { __v: 0 }
+    );
+
+    const enrichedDonors = await Promise.all(
+      donors.map(async (donor) => {
         try {
-          const gestational = await Gestational.findOne({
-            gestationalId: item.gestationalAge,
-          });
-          const gestationalName = gestational?.gestationalName;
-          const delivery = await Delivery.findOne({
-            deliveryId: item.modeOfDelivery,
-          });
-          const deliveryName = delivery?.deliveryName;
-          const parity = await Parity.findOne({ parityId: item.parity })
-          console.log(parity,'parityByid')
-          const parityName = parity?.parityName;
+          const [gestational, delivery, parity] = await Promise.all([
+            Gestational.findOne({ gestationalId: donor.gestationalAge }),
+            Delivery.findOne({ deliveryId: donor.modeOfDelivery }),
+            Parity.findOne({ parityId: donor.parity }),
+          ]);
+
           return {
-            ...item.toObject(),
-            gestationalName: gestationalName,
-            deliveryName: deliveryName,
-            parityName: parityName,
+            ...donor.toObject(),
+            gestationalName: gestational?.gestationalName || null,
+            deliveryName: delivery?.deliveryName || null,
+            parityName: parity?.parityName || null,
           };
         } catch (error) {
-          console.error("Error while fetching department:", error);
-          // Return a default object or null if department lookup fails
+          console.error("Error while fetching additional data:", error);
           return {
-            ...item.toObject(),
+            ...donor.toObject(),
             gestationalName: null,
             deliveryName: null,
             parityName: null,
@@ -165,16 +232,53 @@ export async function GetDonor(req, res) {
         }
       })
     );
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(200, newArray, "Donor List Generated Successfully")
-      );
+
+    return res.status(200).json(new ApiResponse(200, enrichedDonors, "Donor List Generated Successfully"));
   } catch (error) {
-    console.log(error);
-    return res
-      .status(200)
-      .json(new ApiResponse(500, null, "Internal Server Error"));
+    console.error("Internal Server Error:", error);
+    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+
+export async function copyActiveDonors(req, res) {
+  try {
+    const currentFiscalYear = await getCurrentFiscalYear();
+
+    if (!currentFiscalYear) {
+      return res.status(400).json(new ApiResponse(400, null, "No active fiscal year found"));
+    }
+
+    const previousFiscalYear = await getPreviousFiscalYear(currentFiscalYear);
+
+    if (!previousFiscalYear) {
+      return res.status(400).json(new ApiResponse(400, null, "No previous fiscal year found"));
+    }
+
+    // Find active donors from the previous fiscal year
+    const activeDonors = await DaanDarta.find({
+      isDonorActive: true,
+      fiscalYear: previousFiscalYear._id
+    });
+
+    // Prepare new donors for the current fiscal year
+    const newDonors = activeDonors.map(donor => ({
+      ...donor.toObject(),
+      // _id: new mongoose.Types.ObjectId(), // Create a new ObjectId
+      fiscalYear: currentFiscalYear._id
+    }));
+
+    // Insert the new donors into the collection
+    if (newDonors.length > 0) {
+      await DaanDarta.insertMany(newDonors);
+    }
+
+    // Enrich donor data
+    const enrichedDonors = await Promise.all(newDonors.map(enrichDonorData));
+
+    return res.status(200).json(new ApiResponse(200, enrichedDonors, "Donors copied and enriched successfully"));
+  } catch (error) {
+    console.error("Internal Server Error:", error);
+    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
