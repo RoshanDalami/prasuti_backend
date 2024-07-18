@@ -9,7 +9,6 @@ import { Parity } from "../Model/dropdownModels/parity.model.js";
 import { Delivery } from "../Model/dropdownModels/delivery.model.js";
 import mongoose from "mongoose";
 
-
 // Function to get the current fiscal year
 async function getCurrentFiscalYear() {
   return await Fiscal.findOne({ status: true });
@@ -26,11 +25,11 @@ export async function RegisterDonor(req, res) {
 
   try {
     const latestDaanDarta = await DaanDarta.findOne(
-      {$and:[{isDonorActive:true,fiscalYear:_id}]},
+      { $and: [{ isDonorActive: true, fiscalYear: _id }] },
       {},
       { sort: { donorRegNo: -1 } }
     );
-    console.log(latestDaanDarta)
+    console.log(latestDaanDarta);
     let newDonorRegNo = "PMWH-0001";
 
     // const state = State.findOne({statedId : body?.address?.stateId})
@@ -195,17 +194,21 @@ export async function RegisterDonor(req, res) {
 // }
 export async function GetDonor(req, res) {
   try {
+    const page = parseInt(req.query.page) || 1; // default to page 1
+    const limit = parseInt(req.query.limit) || 10; // default to 10 items per page
+
     const fiscalYear = await Fiscal.findOne({ status: true });
 
     if (!fiscalYear) {
-      return res.status(400).json(new ApiResponse(400, null, "No active fiscal year found"));
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "No active fiscal year found"));
     }
+    const totalCount = await DaanDarta.countDocuments({ isDonorActive: true });
 
-    const donors = await DaanDarta.find(
-      { isDonorActive: true},
-      { __v: 0 }
-    );
-
+    const donors = await DaanDarta.find({ isDonorActive: true }, { __v: 0 })
+      .skip((page - 1) * limit)
+      .limit(limit);
     const enrichedDonors = await Promise.all(
       donors.map(async (donor) => {
         try {
@@ -233,10 +236,20 @@ export async function GetDonor(req, res) {
       })
     );
 
-    return res.status(200).json(new ApiResponse(200, enrichedDonors, "Donor List Generated Successfully"));
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { data: enrichedDonors, totalCount },
+          "Donor List Generated Successfully"
+        )
+      );
   } catch (error) {
     console.error("Internal Server Error:", error);
-    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
@@ -245,26 +258,30 @@ export async function copyActiveDonors(req, res) {
     const currentFiscalYear = await getCurrentFiscalYear();
 
     if (!currentFiscalYear) {
-      return res.status(400).json(new ApiResponse(400, null, "No active fiscal year found"));
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "No active fiscal year found"));
     }
 
     const previousFiscalYear = await getPreviousFiscalYear(currentFiscalYear);
 
     if (!previousFiscalYear) {
-      return res.status(400).json(new ApiResponse(400, null, "No previous fiscal year found"));
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "No previous fiscal year found"));
     }
 
     // Find active donors from the previous fiscal year
     const activeDonors = await DaanDarta.find({
       isDonorActive: true,
-      fiscalYear: previousFiscalYear._id
+      fiscalYear: previousFiscalYear._id,
     });
 
     // Prepare new donors for the current fiscal year
-    const newDonors = activeDonors.map(donor => ({
+    const newDonors = activeDonors.map((donor) => ({
       ...donor.toObject(),
       // _id: new mongoose.Types.ObjectId(), // Create a new ObjectId
-      fiscalYear: currentFiscalYear._id
+      fiscalYear: currentFiscalYear._id,
     }));
 
     // Insert the new donors into the collection
@@ -275,10 +292,20 @@ export async function copyActiveDonors(req, res) {
     // Enrich donor data
     const enrichedDonors = await Promise.all(newDonors.map(enrichDonorData));
 
-    return res.status(200).json(new ApiResponse(200, enrichedDonors, "Donors copied and enriched successfully"));
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          enrichedDonors,
+          "Donors copied and enriched successfully"
+        )
+      );
   } catch (error) {
     console.error("Internal Server Error:", error);
-    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
@@ -317,101 +344,140 @@ export async function DataForExcel(req, res) {
   }
 }
 
-export async function UpdateDonorStatus(req,res){
+export async function UpdateDonorStatus(req, res) {
   try {
-    const {id} = req.params;
-    const previousData = await DaanDarta.findOne({_id:id});
-    const previousStatus = previousData?.isDonorActive
-    const response = await DaanDarta.findOneAndUpdate({_id:id},{
-      $set:{
-        isDonorActive: !previousStatus
-      }
-    },{new:true});
-    return res.status(200).json(new ApiResponse(200,response,"Donor updated successfully"))
+    const { id } = req.params;
+    const previousData = await DaanDarta.findOne({ _id: id });
+    const previousStatus = previousData?.isDonorActive;
+    const response = await DaanDarta.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          isDonorActive: !previousStatus,
+        },
+      },
+      { new: true }
+    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "Donor updated successfully"));
   } catch (error) {
     console.log(error);
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
-export async function UpdateDonorOtherTest(req,res){
+export async function UpdateDonorOtherTest(req, res) {
   try {
     const { id, other } = req.body;
 
     // Validate ID
-  
 
     // Find and update the document
     const response = await DaanDarta.findOneAndUpdate(
       { _id: id },
       { $push: { other: { $each: other } } },
-      { new: true, runValidators: true ,upsert:true}
+      { new: true, runValidators: true, upsert: true }
     );
 
     // Check if document was found and updated
     if (!response) {
-      return res.status(404).json(new ApiResponse(404, null, "Document not found"));
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Document not found"));
     }
 
-    return res.status(200).json(new ApiResponse(200, response, "Update successful"));
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "Update successful"));
   } catch (error) {
-    console.error('Error updating document:', error);
-    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+    console.error("Error updating document:", error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
-export async function getDonorOtherTest(req,res){
+export async function getDonorOtherTest(req, res) {
   try {
-    const {id} = req.params;
-    const response = await DaanDarta.findOne({_id:id})
-    const otherTests = response?.other
-    return res.status(200).json(new ApiResponse(200,otherTests,"Other test Generated successfully"))
+    const { id } = req.params;
+    const response = await DaanDarta.findOne({ _id: id });
+    const otherTests = response?.other;
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, otherTests, "Other test Generated successfully")
+      );
   } catch (error) {
-    return res.status(500).json(500,null,"Internal Server Error")
+    return res.status(500).json(500, null, "Internal Server Error");
   }
 }
 
-export async function discard(req,res){
+export async function discard(req, res) {
   try {
-    const {id,discardDate} = req.body;
-    const response = await DaanDarta.findOneAndUpdate({_id:id},{
-      $set:{
-        discard:true,
-        isDonorActive:false,
-        discardDate:discardDate
-
+    const { id, discardDate } = req.body;
+    const response = await DaanDarta.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          discard: true,
+          isDonorActive: false,
+          discardDate: discardDate,
+        },
       }
-    })
-    return res.status(200).json(new ApiResponse(200,response,'Discarded successfully'))
+    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "Discarded successfully"));
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
-export async function UpdateDonorRegDate(req,res){
+export async function UpdateDonorRegDate(req, res) {
   try {
-    await DaanDarta.updateMany({},{$set:{
-      donorRegisteredDate:"2080-02-13"
-    }})
-    return res.status(200).json(new ApiResponse(200,'success','updaetd'))
+    await DaanDarta.updateMany(
+      {},
+      {
+        $set: {
+          donorRegisteredDate: "2080-02-13",
+        },
+      }
+    );
+    return res.status(200).json(new ApiResponse(200, "success", "updaetd"));
   } catch (error) {
-  return res.status(500).json(new ApiResponse(500,null,"Internal Server error"))  
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server error"));
   }
 }
 
-export async function getDonorByGestationalAge(req,res){
+export async function getDonorByGestationalAge(req, res) {
   try {
-    const {id} = req.params;
-    if(!id){
-      return res.status(400).json(new ApiResponse(400,null,"id not found"))
+    const { id } = req.params;
+    if (!id) {
+      return res.status(400).json(new ApiResponse(400, null, "id not found"));
     }
-    const response = await DaanDarta.find({gestationalAge:id});
-    if(!response){
-      return res.status(400).json(new ApiResponse(400,null,"Data not found"));
+    const response = await DaanDarta.find({ gestationalAge: id });
+    if (!response) {
+      return res.status(400).json(new ApiResponse(400, null, "Data not found"));
     }
-    return res.status(200).json(new ApiResponse(200,response,'Donor generated according to Gestational Age.'))
-    
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          response,
+          "Donor generated according to Gestational Age."
+        )
+      );
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,'Internal Server Error'))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
