@@ -108,7 +108,7 @@ const verbalExaminationSchema = new mongoose.Schema({
   examDate: {
     type: Date,
   },
-
+ 
   testAfterSomeDays: {
     type: Number,
   },
@@ -129,6 +129,9 @@ const donorPhysicalExaminationSchema = new mongoose.Schema({
   },
   doctorName: {
     type: String,
+  },
+  hospital:{
+    type:String
   },
   examinationDate: {
     type: Date,
