@@ -39,7 +39,7 @@ export async function RegisterDonor(req, res) {
     if (latestDaanDarta) {
       const lastDonorRegNo = latestDaanDarta.donorRegNo?.split("-")[1];
       const numericPart = parseInt(lastDonorRegNo, 10);
-      newDonorRegNo = "PMWH-" + (numericPart + 1).toString().padStart(3, "0");
+      newDonorRegNo = "PMWH-" + (numericPart + 1).toString().padStart(4, "0");
     }
 
     let newDaanDarta = new DaanDarta({
