@@ -277,7 +277,7 @@ async function RegisterEmployee(req, res) {
   } = req.body;
 
   try {
-    
+
     let employeeId = parseInt(1, 10);
     const latestEmployee = await Employee.findOne(
       {},
@@ -361,10 +361,34 @@ async function RegisterEmployee(req, res) {
 }
 async function GetEmployee(req, res) {
   try {
+    const departmentList = await Department.find({});
+    const postList = await Post.find();
     const response = await Employee.find({});
+   const result  = [];
+       response?.forEach((employee) => {
+     departmentList?.forEach(department => {
+       if(department.departmentId === employee.departmentId) {
+         result.push({
+           ...employee._doc,
+           departmentName:department.departmentName,
+         })
+       }
+     })
+   });
+       const FinalResult =[];
+       result?.forEach((employee) => {
+         postList?.forEach(post => {
+           if(post.postId === employee.postId){
+             FinalResult.push({
+               ...employee,
+               postName : post.postName
+             })
+           }
+         })
+       })
     return res
       .status(200)
-      .json(new ApiResponse(200, response, "Employee generated successfully"));
+      .json(new ApiResponse(200, FinalResult, "Employee generated successfully"));
   } catch (error) {
     return res
       .status(500)

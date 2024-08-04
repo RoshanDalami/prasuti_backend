@@ -289,20 +289,20 @@ async function getDonorWithTotalMilk(req, res) {
   try {
     // Fetch all entries from MilkVolume
     const milkVolumes = await MilkVolume.find({});
-    
+
     // Create a set of unique donorIds
     const donorIds = [...new Set(milkVolumes.map(entry => entry.donorId))];
-    
+
     // Fetch donor details from DaanDarta
     const donors = await DaanDarta.find({});
-    
+
 
     // Create a map for quick lookup of donor details
     const donorDetailsMap = donors.reduce((acc, donor) => {
       acc[donor._id] = donor;
       return acc;
     }, {});
-console.log(donorDetailsMap)
+
     // Calculate total milk collected by each donor and include donor details
     const totalMilkCollectedByUserId = milkVolumes.reduce((acc, entry) => {
       const userId = entry.donorId;
@@ -320,7 +320,7 @@ console.log(donorDetailsMap)
       } else {
         acc[userId].totalMilkCollected += entry.totalMilkCollected;
       }
-      
+
       return acc;
     }, {});
 

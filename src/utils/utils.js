@@ -1,0 +1,1 @@
+export const getDays = (date,days)=>{    const parsedDate = new Date(date);    const currentDate = new Date();console.log(date , days)    const differenceInTime = currentDate - parsedDate;    const differenceInDays = Math.floor(differenceInTime / (1000 * 60 * 60 * 24));    return differenceInDays + days}
