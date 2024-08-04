@@ -7,6 +7,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Gestational } from "../Model/dropdownModels/gestational.model.js";
 import { Parity } from "../Model/dropdownModels/parity.model.js";
 import { Delivery } from "../Model/dropdownModels/delivery.model.js";
+import {getDays} from "../utils/utils.js";
 import mongoose from "mongoose";
 
 // Function to get the current fiscal year
@@ -209,6 +210,17 @@ export async function GetDonor(req, res) {
     const donors = await DaanDarta.find({ isDonorActive: true }, { __v: 0 })
       .skip((page - 1) * limit)
       .limit(limit);
+    const totalDonor = await DaanDarta.find({});
+    if(totalDonor){
+    for( const donor of totalDonor){
+
+      const updatedAge = getDays(donor?.engDate,donor?.ageOfChild);
+        console.log(updatedAge);
+      donor.updatedAgeOFChild = parseInt(updatedAge);
+      donor.save()
+    }
+    }
+
     const enrichedDonors = await Promise.all(
       donors.map(async (donor) => {
         try {

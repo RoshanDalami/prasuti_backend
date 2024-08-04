@@ -110,7 +110,7 @@ async function updateBabyStatus (req,res){
     const {id} = req.params;
     const getBaby = await BabyDetail.findOne({_id:id});
     if(!getBaby) return res.status(400).json(new ApiResponse(400,null,"No baby exist with this id"))
-    let status 
+    let status
     if(getBaby){
       status = getBaby?.status;
     }
@@ -124,6 +124,55 @@ async function updateBabyStatus (req,res){
   } catch (error) {
     console.log(error)
     return res.status(500).json(new ApiResponse(500,null,"Internal  Server Error"))
+  }
+}
+export async function statusUpdate(req,res){
+ try{
+   const {id} = req.params;
+   const baby = await BabyDetail.findOne({_id:id});
+   if(baby){
+
+    const response = await BabyDetail.findOneAndUpdate({_id:id},{
+      $set:{status:!baby?.status}
+    });
+    if(!response){
+      return res.status(400).json(new ApiResponse(400,null,"Error while updating status"))
+    }
+   }
+   return res.status(200).json(new ApiResponse(200,null,"Baby status created successfully"));
+ }catch (error){
+   return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+ }
+}
+
+
+export async function GetInactiveBaby(req,res){
+  try{
+    try {
+      const response = await BabyDetail.find({status:false}, { __v: 0 });
+      const milkDetail = [];
+      const array = await Promise.all(
+          response.map(async (items) => {
+            const babyDetails = await MilkRequsition.find({ babyId: items._id });
+
+            const finalArray = babyDetails.map((item) => {
+              return { ...items._doc, milkDetail: item?.requisitedMilk };
+            });
+            milkDetail.push(...finalArray);
+            // return { ...item._doc, milkDetail: babyDetails?.requisitedMilk , milkConsumed: babyDetails?.requisitedMilk.map((item)=>{return item.quantity}).reduce((acc,amount)=>acc+amount,0) || 0  };
+          })
+      );
+
+      return res
+          .status(200)
+          .json(new ApiResponse(200, response, "Baby details generated successfully"));
+    } catch (error) {
+      return res
+          .status(500)
+          .json(new ApiResponse(500, null, "Internal Server Error"));
+    }
+  }catch(error){
+    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"));
   }
 }
 export { createBabyDetail, getBabyDetail, getBabyDetailId,updateBabyStatus };

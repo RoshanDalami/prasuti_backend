@@ -181,14 +181,14 @@ async function createPasteurization(req, res) {
     // }
     for (const item of donorList){
       const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
-     
+
         if (donor?.remaining < item.volumeOfMilkPooled) {
           throw new Error("Invalid Milk volume");
         }
     }
     for (const item of donorList) {
       const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
-        let colostrum 
+        let colostrum
         if (donor?.remaining < item.volumeOfMilkPooled) {
           throw new Error("Invalid Milk volume");
         }
@@ -201,7 +201,7 @@ async function createPasteurization(req, res) {
           { _id:item?.milkvolumeId },
           { $set: { remaining: newRemaining ,  } }
         );
-      
+
 
       // try {
 
@@ -273,7 +273,6 @@ async function getPasteurization(req, res) {
       };
     }));
 
-    console.log(newResponse);
     return res
       .status(201)
       .json(new ApiResponse(200, newResponse, "List generated Successfully"));
@@ -365,11 +364,11 @@ async function getDonorWithTotalMilk(req,res){
 //       .json(new ApiResponse(500, null, "Internal Server Error"));
 //   }
 // }
-//gpt version
+
 async function getDonorByGestationalAge(req, res) {
   try {
     const { gestationalAge } = req.params;
-    const donors = await DaanDarta.find({ gestationalAge: gestationalAge });
+    const donors = await DaanDarta.find({ $or:[{gestationalAge:gestationalAge},{updatedAgeOFChild : {$gte:28}}] });
 
     // Use Promise.all to handle all async operations concurrently
     const filterArray = await Promise.all(donors.map(async (donor) => {
@@ -404,6 +403,7 @@ async function getDonorByGestationalAge(req, res) {
             donorName: donor.donorName,
             hosRegNo: donor.hosRegNo,
             donorRegNo:donor.donorRegNo,
+            is28Days : donor.updatedAgeOFChild >= 28 ? true : false,
             date: response[0].date  // Assuming donor.name contains the donorName
           };
         }
@@ -454,7 +454,7 @@ async function updateOtherStatus(req,res){
   try {
     const {id,other,feededToBaby,otherTestDate} = req.body;
     let discard ;
-  
+
     const response = await Pasteurization.findOneAndUpdate({_id:id},{
       $set:{
         other: other,
@@ -462,7 +462,7 @@ async function updateOtherStatus(req,res){
         otherTestDate:otherTestDate,
       }
     },{new:true});
-    
+
     return res.status(200).json(new ApiResponse(200,response,"Other status updated successfully"))
   } catch (error) {
     console.log(error);
