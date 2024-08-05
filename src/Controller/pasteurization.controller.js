@@ -266,7 +266,8 @@ async function getPasteurization(req, res) {
     // Map response to array of promises and use Promise.all to wait for all to resolve
     const newResponse = await Promise.all(response.map(async (item) => {
       const bottle = await Bottle.findOne({ poolingId: item._id });
-      const remainingOnBottle = bottle?.bottleList?.map((bottleItem) => bottleItem.remainingVoluem)?.reduce((acc, amt) => acc + amt, 0);
+      const pasturization = await Pasteurization.findOne({ _id:item._id });
+      const remainingOnBottle = bottle ? bottle?.bottleList?.map((bottleItem) => bottleItem.remainingVoluem)?.reduce((acc, amt) => acc + amt, 0) : pasturization?.donorDetailsForPooling?.map((item)=>item.volumeOfMilkPooled).reduce((acc, amt) => acc + amt, 0);
       return {
         ...item.toObject(), // Convert Mongoose document to plain object
         remaining: remainingOnBottle
