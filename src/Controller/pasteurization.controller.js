@@ -369,7 +369,7 @@ async function getDonorWithTotalMilk(req,res){
 async function getDonorByGestationalAge(req, res) {
   try {
     const { gestationalAge } = req.params;
-    const donors = await DaanDarta.find({ $or:[{gestationalAge:gestationalAge},{updatedAgeOFChild : {$gte:28}}] });
+    const donors = gestationalAge == 2 ? await DaanDarta.find({gestationalAge:gestationalAge} ) :   await DaanDarta.find({ $or:[{gestationalAge:gestationalAge},{updatedAgeOFChild : {$gte:28}}] });
 
     // Use Promise.all to handle all async operations concurrently
     const filterArray = await Promise.all(donors.map(async (donor) => {
@@ -405,6 +405,7 @@ async function getDonorByGestationalAge(req, res) {
             hosRegNo: donor.hosRegNo,
             donorRegNo:donor.donorRegNo,
             is28Days : donor.updatedAgeOFChild >= 28 ? true : false,
+            gestationalId:donor.gestationalAge,
             date: response[0].date  // Assuming donor.name contains the donorName
           };
         }

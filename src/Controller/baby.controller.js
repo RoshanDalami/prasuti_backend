@@ -175,4 +175,24 @@ export async function GetInactiveBaby(req,res){
     return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"));
   }
 }
+
+export const  SearchBaby = async(req,res)=>{
+    try {
+      const {term} = req.params;
+      if(!term){
+        return res.status(400).json( new ApiResponse(400,null,"Search Term is required"));
+      }
+      const response = await BabyDetail?.find({
+        $or: [
+          { babyName: { $regex: term, $options: 'i' } },
+          { ipNumber: { $regex: term, $options: 'i' } },
+        ]
+      });
+      return res.status(200).json(new ApiResponse(200,response,"baby found successfully"))
+    } catch (error) {
+      return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    }
+    
+
+}
 export { createBabyDetail, getBabyDetail, getBabyDetailId,updateBabyStatus };
