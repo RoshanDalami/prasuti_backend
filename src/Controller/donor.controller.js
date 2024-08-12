@@ -196,7 +196,7 @@ export async function RegisterDonor(req, res) {
 export async function GetDonor(req, res) {
   try {
     const page = parseInt(req.query.page) || 1; // default to page 1
-    const limit = parseInt(req.query.limit) || 10; // default to 10 items per page
+    const limit = parseInt(req.query.limit) || 8; // default to 10 items per page
 
     const fiscalYear = await Fiscal.findOne({ status: true });
 
@@ -208,8 +208,8 @@ export async function GetDonor(req, res) {
     const totalCount = await DaanDarta.countDocuments({ isDonorActive: true });
 
     const donors = await DaanDarta.find({ isDonorActive: true }, { __v: 0 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+      // .skip((page - 1) * limit)
+      // .limit(limit);
     const totalDonor = await DaanDarta.find({});
     if(totalDonor){
     for( const donor of totalDonor){
