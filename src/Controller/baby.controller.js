@@ -192,7 +192,14 @@ export const  SearchBaby = async(req,res)=>{
     } catch (error) {
       return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
     }
-    
 
+
+}
+export const getIpList = async(req,res)=>{
+  try{
+    const list = await BabyDetail.find({});
+    const ipList = list.map(item => item?.ipNumber  )
+    return res.status(200).json( new ApiResponse(200, ipList,"IP List generated successfully") )
+  }catch(error){}
 }
 export { createBabyDetail, getBabyDetail, getBabyDetailId,updateBabyStatus };

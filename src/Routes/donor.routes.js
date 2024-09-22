@@ -1,5 +1,5 @@
 import express from 'express'
-import { RegisterDonor , GetDonor,GetInActiveDonor,UpdateDonorStatus,UpdateDonorOtherTest,getDonorOtherTest , discard,UpdateDonorRegDate,getDonorByGestationalAge , copyActiveDonors } from '../Controller/donor.controller.js'
+import { RegisterDonor , GetDonor,GetInActiveDonor,UpdateDonorStatus,UpdateDonorOtherTest,getDonorOtherTest , discard,UpdateDonorRegDate,getDonorByGestationalAge , copyActiveDonors , getDonorReg } from '../Controller/donor.controller.js'
 const DonorRouter = express.Router();
 
 DonorRouter.route('/getDonorList').get(GetDonor);
@@ -11,5 +11,8 @@ DonorRouter.route("/getOtherTest/:id").get(getDonorOtherTest)
 DonorRouter.route("/discard").post(discard)
 DonorRouter.route('/update').get(UpdateDonorRegDate)
 DonorRouter.route('/getDonorWithGestationalAge/:id').get(getDonorByGestationalAge)
-DonorRouter.route('/copyActiveDonor').get(copyActiveDonors)
+DonorRouter.route('/copyActiveDonor').get(copyActiveDonors);
+DonorRouter.route('/regList').get(getDonorReg);
+
+
 export {DonorRouter}

@@ -26,7 +26,7 @@ export async function RegisterDonor(req, res) {
 
   try {
     const latestDaanDarta = await DaanDarta.findOne(
-      { $and: [{ isDonorActive: true, fiscalYear: _id }] },
+      { $and: [{ fiscalYear: _id }] },
       {},
       { sort: { donorRegNo: -1 } }
     );
@@ -207,9 +207,9 @@ export async function GetDonor(req, res) {
     }
     const totalCount = await DaanDarta.countDocuments({ isDonorActive: true });
 
-    const donors = await DaanDarta.find({ isDonorActive: true }, { __v: 0 })
-      // .skip((page - 1) * limit)
-      // .limit(limit);
+    const donors = await DaanDarta.find({ isDonorActive: true }, { __v: 0 }).sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
     const totalDonor = await DaanDarta.find({});
     if(totalDonor){
     for( const donor of totalDonor){
@@ -491,5 +491,14 @@ export async function getDonorByGestationalAge(req, res) {
     return res
       .status(500)
       .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+export async function getDonorReg(req,res){
+  try{
+    const list = await DaanDarta.find({});
+    const hosRegNoList = list?.map((item) =>  item.hosRegNo);
+    return res.status(200).json(new ApiResponse(200, hosRegNoList,'list'));
+  }catch(error){
+    return res.status(500).json(new ApiResponse(500,null,'internal server error'))
   }
 }

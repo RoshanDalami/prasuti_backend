@@ -107,5 +107,63 @@ async function GetBottle(req, res) {
       .json(new ApiResponse(500, null, "Internal server error"));
   }
 }
+async function updateBottleStatus(req,res){
+  try{
+    const {id} = req.params;
+    const bottle = await Bottle.findOne(
+        { "bottleList._id": id },
+        { bottleList: { $elemMatch: { _id: id } } } // Project only the matching item in bottleList
+    );
 
-export { GenerateBottle, GetBottle };
+// Check if the bottle was found and has the item
+    if (bottle && bottle.bottleList.length > 0) {
+      const currentItem = bottle.bottleList[0]; // Get the matching item
+      const newStatus = !currentItem.isActive; // Toggle the current status
+
+      // Step 2: Update the item's isActive field
+      const response = await Bottle.findOneAndUpdate(
+          { "bottleList._id": id },
+          { $set: { "bottleList.$.isActive": newStatus } }, // Toggle the isActive field
+          { new: true } // Return the updated document
+      );
+
+      console.log(response);
+    return res.status(200).json( new ApiResponse(200, response, "Bottle updated successfully") );
+    } else {
+      console.log("Item not found");
+    }
+
+
+  }catch(err){
+    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+async function updateManyBottles(req,res){
+  try{
+    const response = await Bottle.updateMany(
+        { /* filter criteria for the main document */ },
+        [
+          {
+            $set: {
+              bottleList: {
+                $map: {
+                  input: "$bottleList",
+                  as: "item",
+                  in: {
+                    $cond: [
+                      { /* condition to match items for update */ },
+                      { $mergeObjects: ["$$item", { isActive: true }] }, // Update fields if condition is met
+                      "$$item" // Otherwise, keep the item unchanged
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+    );
+    return res.status(200).json( new ApiResponse(200, response, "Bottle updated successfully"));
+  }catch(err){}
+}
+
+export { GenerateBottle, GetBottle,updateBottleStatus,updateManyBottles };

@@ -5,7 +5,7 @@ const bottleList = new Schema({
     type: String,
     required: true,
   },
-  
+
   volume: {
     type: Number,
     required: true,
@@ -30,6 +30,10 @@ const bottleList = new Schema({
     type: String,
     required: true,
   },
+    isActive:{
+      type:Boolean,
+        default:true
+    }
 });
 
 const bottleSchema = new Schema(
