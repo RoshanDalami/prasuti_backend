@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "Backend for prasuti_girha",
   "type": "module",
-  "main": "index.js",
+  "main": "index.cjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/index.js"
+    "start":"node index.cjs",
+    "dev": "nodemon index.cjs"
   },
   "author": "",
   "license": "ISC",

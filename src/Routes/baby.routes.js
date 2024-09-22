@@ -6,7 +6,8 @@ import {
   updateBabyStatus,
   statusUpdate,
   GetInactiveBaby,
-  SearchBaby
+  SearchBaby,
+  getIpList
 
 } from "../Controller/baby.controller.js";
 const babyRoute = express.Router();
@@ -20,5 +21,6 @@ babyRoute.route("/updateBaby/:id").get(updateBabyStatus);
 babyRoute.route("/statusUpdate/:id").get(statusUpdate);
 babyRoute.route("/getInactiveBaby").get(GetInactiveBaby);
 babyRoute.route("/searchBaby/:term").get(SearchBaby)
+babyRoute.route("/ipList").get(getIpList)
 
 export { babyRoute };
