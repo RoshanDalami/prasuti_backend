@@ -208,8 +208,8 @@ export async function GetDonor(req, res) {
     const totalCount = await DaanDarta.countDocuments({ isDonorActive: true });
 
     const donors = await DaanDarta.find({ isDonorActive: true }, { __v: 0 }).sort({ createdAt: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
+      // .skip((page - 1) * limit)
+      // .limit(limit);
     const totalDonor = await DaanDarta.find({});
     if(totalDonor){
     for( const donor of totalDonor){
