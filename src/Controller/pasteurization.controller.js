@@ -3,7 +3,7 @@ import { MilkVolume } from "../Model/volumeOfMilk.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { DaanDarta } from "../Model/donorDetails.model.js";
 import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
-import { Bottle } from '../Model/bottle.model.js'
+import { Bottle } from "../Model/bottle.model.js";
 async function getColostrum(req, res) {
   try {
     let filteredDonarData = [];
@@ -90,7 +90,7 @@ async function createPasteurization(req, res) {
     const donorList = body?.donorDetailsForPooling;
     let batchName = "";
     const existingList = await Pasteurization.find({
-     $and:[{ poolingCondition: body.poolingCondition,date:body.date}],
+      $and: [{ poolingCondition: body.poolingCondition, date: body.date }],
     });
 
     const lastElement = existingList[existingList.length - 1];
@@ -143,14 +143,14 @@ async function createPasteurization(req, res) {
         batchName = "TA";
       }
     }
-    console.log(donorList)
+    console.log(donorList);
     donorList.sort(
       (a, b) => new Date(a.collectedDate) - new Date(b.collectedDate)
     );
     const currentDate = new Date(body.date);
     let expireDate = new Date(body.date);
     expireDate.setMonth(currentDate.getMonth() + 6);
-    console.log(expireDate)
+    console.log(expireDate);
     expireDate = JSON.stringify(expireDate).split("T")[0].slice(1);
 
     const newPooling = new Pasteurization({
@@ -179,29 +179,27 @@ async function createPasteurization(req, res) {
     //   });
     // });
     // }
-    for (const item of donorList){
-      const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
+    for (const item of donorList) {
+      const donor = await MilkVolume.findOne({ _id: item?.milkvolumeId });
 
-        if (donor?.remaining < item.volumeOfMilkPooled) {
-          throw new Error("Invalid Milk volume");
-        }
+      if (donor?.remaining < item.volumeOfMilkPooled) {
+        throw new Error("Invalid Milk volume");
+      }
     }
     for (const item of donorList) {
-      const donor = await MilkVolume.findOne({_id:item?.milkvolumeId });
-        let colostrum
-        if (donor?.remaining < item.volumeOfMilkPooled) {
-          throw new Error("Invalid Milk volume");
-        }
-        const newRemaining =
-          donor?.remaining - item.volumeOfMilkPooled;
-          if(newRemaining <= 0){
-            colostrum = false;
-          }
-        await MilkVolume.findOneAndUpdate(
-          { _id:item?.milkvolumeId },
-          { $set: { remaining: newRemaining ,  } }
-        );
-
+      const donor = await MilkVolume.findOne({ _id: item?.milkvolumeId });
+      let colostrum;
+      if (donor?.remaining < item.volumeOfMilkPooled) {
+        throw new Error("Invalid Milk volume");
+      }
+      const newRemaining = donor?.remaining - item.volumeOfMilkPooled;
+      if (newRemaining <= 0) {
+        colostrum = false;
+      }
+      await MilkVolume.findOneAndUpdate(
+        { _id: item?.milkvolumeId },
+        { $set: { remaining: newRemaining } }
+      );
 
       // try {
 
@@ -240,7 +238,7 @@ async function createPasteurization(req, res) {
       return res.status(201).json(new ApiResponse(200, response, "Success"));
     }
     const savedData = await newPooling.save();
-
+    console.log(savedData,'pastrizuation');
     return res.status(201).json(new ApiResponse(200, savedData, "Success"));
   } catch (error) {
     console.log(error);
@@ -264,22 +262,32 @@ async function getPasteurization(req, res) {
     }
 
     // Map response to array of promises and use Promise.all to wait for all to resolve
-    const newResponse = await Promise.all(response.map(async (item) => {
-      const bottle = await Bottle.findOne({ poolingId: item._id });
-      const pasturization = await Pasteurization.findOne({ _id:item._id });
-      const remainingOnBottle = bottle ? bottle?.bottleList?.map((bottleItem) => bottleItem.remainingVoluem)?.reduce((acc, amt) => acc + amt, 0) : pasturization?.donorDetailsForPooling?.map((item)=>item.volumeOfMilkPooled).reduce((acc, amt) => acc + amt, 0);
-      return {
-        ...item.toObject(), // Convert Mongoose document to plain object
-        remaining: remainingOnBottle
-      };
-    }));
+    const newResponse = await Promise.all(
+      response.map(async (item) => {
+        const bottle = await Bottle.findOne({ poolingId: item._id });
+        const pasturization = await Pasteurization.findOne({ _id: item._id });
+        const remainingOnBottle = bottle
+          ? bottle?.bottleList
+              ?.map((bottleItem) => bottleItem.remainingVoluem)
+              ?.reduce((acc, amt) => acc + amt, 0)
+          : pasturization?.donorDetailsForPooling
+              ?.map((item) => item.volumeOfMilkPooled)
+              .reduce((acc, amt) => acc + amt, 0);
+        return {
+          ...item.toObject(), // Convert Mongoose document to plain object
+          remaining: remainingOnBottle,
+        };
+      })
+    );
 
     return res
       .status(201)
       .json(new ApiResponse(200, newResponse, "List generated Successfully"));
   } catch (error) {
     console.log(error);
-    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 //getbyId
@@ -319,10 +327,10 @@ async function deletePasteurizationById(req, res) {
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
-async function getDonorWithTotalMilk(req,res){
+async function getDonorWithTotalMilk(req, res) {
   try {
     const { gestationalAge } = req.params;
-    const response = await DaanDarta.find({ });
+    const response = await DaanDarta.find({});
     const filterArray = [];
     for (const donor of response) {
       const donorId = donor._id;
@@ -369,119 +377,160 @@ async function getDonorWithTotalMilk(req,res){
 async function getDonorByGestationalAge(req, res) {
   try {
     const { gestationalAge } = req.params;
-    const donors = gestationalAge == 2 ? await DaanDarta.find({gestationalAge:gestationalAge} ) :   await DaanDarta.find({ $or:[{gestationalAge:gestationalAge},{updatedAgeOFChild : {$gte:28}}] });
+    const donors =
+      gestationalAge == 2
+        ? await DaanDarta.find({ gestationalAge: gestationalAge })
+        : await DaanDarta.find({
+            $or: [
+              { gestationalAge: gestationalAge },
+              { updatedAgeOFChild: { $gte: 28 } },
+            ],
+          });
 
     // Use Promise.all to handle all async operations concurrently
-    const filterArray = await Promise.all(donors.map(async (donor) => {
-      try {
-        // Aggregation pipeline to sum up the 'remaining' field for each donorId
-        const response = await MilkVolume.aggregate([
-          { $match: { donorId: donor._id } },
-          {
-            $group: {
-              _id: "$donorId",
-              remaining: { $sum: "$remaining" },
-              totalMilkCollected :{$sum:"$totalMilkCollected"}
-            }
-          },
-          {
-            $project: {
-              _id: 0,
-              donorId: "$_id",
-              remaining: 1,
-              totalMilkCollected:1,
-              date: { $arrayElemAt: ["$dates", 0] }
-            }
+    const filterArray = await Promise.all(
+      donors.map(async (donor) => {
+        try {
+          // Aggregation pipeline to sum up the 'remaining' field for each donorId
+          const response = await MilkVolume.aggregate([
+            { $match: { donorId: donor._id } },
+            {
+              $group: {
+                _id: "$donorId",
+                remaining: { $sum: "$remaining" },
+                totalMilkCollected: { $sum: "$totalMilkCollected" },
+              },
+            },
+            {
+              $project: {
+                _id: 0,
+                donorId: "$_id",
+                remaining: 1,
+                totalMilkCollected: 1,
+                date: { $arrayElemAt: ["$dates", 0] },
+              },
+            },
+          ]);
+
+          // Check if response is not empty and return required fields
+          if (response.length > 0) {
+            return {
+              donorId: response[0].donorId,
+              remaining: response[0].remaining,
+              totalMilkCollected: response[0].totalMilkCollected,
+              donorName: donor.donorName,
+              hosRegNo: donor.hosRegNo,
+              donorRegNo: donor.donorRegNo,
+              is28Days: donor.updatedAgeOFChild >= 28 ? true : false,
+              gestationalId: donor.gestationalAge,
+              date: response[0].date, // Assuming donor.name contains the donorName
+            };
           }
-        ]);
 
-        // Check if response is not empty and return required fields
-        if (response.length > 0) {
-          return {
-            donorId: response[0].donorId,
-            remaining: response[0].remaining,
-            totalMilkCollected:response[0].totalMilkCollected,
-            donorName: donor.donorName,
-            hosRegNo: donor.hosRegNo,
-            donorRegNo:donor.donorRegNo,
-            is28Days : donor.updatedAgeOFChild >= 28 ? true : false,
-            gestationalId:donor.gestationalAge,
-            date: response[0].date  // Assuming donor.name contains the donorName
-          };
+          return null;
+        } catch (error) {
+          console.error(
+            `Failed to fetch milk volume for donorId ${donor._id}`,
+            error
+          );
+          return null; // Handle the error by returning null
         }
-
-        return null;
-      } catch (error) {
-        console.error(`Failed to fetch milk volume for donorId ${donor._id}`, error);
-        return null; // Handle the error by returning null
-      }
-    }));
+      })
+    );
 
     // Filter out null values from the results
-    const validResponses = filterArray.filter(response => response !== null);
+    const validResponses = filterArray.filter((response) => response !== null);
 
-    return res.status(200).json(new ApiResponse(200, validResponses, "List Generated Successfully"));
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, validResponses, "List Generated Successfully")
+      );
   } catch (error) {
     console.error(error);
-    return res.status(500).json(new ApiResponse(500, null, "Internal Server Error"));
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
-
-
-
-async function updateCulture(req,res){
+async function updateCulture(req, res) {
   try {
-    const {id,culture,cultureDate} = req.body;
-    let discard
-    if(culture == 'true'){
-      discard = true
-    }else{
-      discard = false
+    const { id, culture, cultureDate } = req.body;
+    let discard;
+    if (culture == "true") {
+      discard = true;
+    } else {
+      discard = false;
     }
-    if(!id){
-      return res.status(404).json(new ApiResponse(404,null,'Id not found'))
+    if (!id) {
+      return res.status(404).json(new ApiResponse(404, null, "Id not found"));
     }
-    const response = await Pasteurization.findOneAndUpdate({_id:id},{
-      $set:{culture:culture,discard:discard,cultureDate:cultureDate}
-    },{new:true});
-    return res.status(200).json(new ApiResponse(200,response,"Updated Successfully"))
-  } catch (error) {
-    console.log(error)
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
-  }
-}
-
-async function updateOtherStatus(req,res){
-  try {
-    const {id,other,feededToBaby,otherTestDate} = req.body;
-    let discard ;
-
-    const response = await Pasteurization.findOneAndUpdate({_id:id},{
-      $set:{
-        other: other,
-        feededToBaby:feededToBaby,
-        otherTestDate:otherTestDate,
-      }
-    },{new:true});
-
-    return res.status(200).json(new ApiResponse(200,response,"Other status updated successfully"))
+    const response = await Pasteurization.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: { culture: culture, discard: discard, cultureDate: cultureDate },
+      },
+      { new: true }
+    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "Updated Successfully"));
   } catch (error) {
     console.log(error);
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
-async function discard(req,res){
+
+async function updateOtherStatus(req, res) {
   try {
-    const {id} = req.params;
-    const response = await Pasteurization.findOneAndUpdate({_id:id},{
-      $set:{
-        discard:true
-      }
-    })
-    return res.status(200).json(new ApiResponse(200,response,'Discarded successfully'))
+    const { id, other, feededToBaby, otherTestDate } = req.body;
+    let discard;
+
+    const response = await Pasteurization.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          other: other,
+          feededToBaby: feededToBaby,
+          otherTestDate: otherTestDate,
+        },
+      },
+      { new: true }
+    );
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, response, "Other status updated successfully")
+      );
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    console.log(error);
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
+  }
+}
+async function discard(req, res) {
+  try {
+    const { id } = req.params;
+    const response = await Pasteurization.findOneAndUpdate(
+      { _id: id },
+      {
+        $set: {
+          discard: true,
+        },
+      }
+    );
+    return res
+      .status(200)
+      .json(new ApiResponse(200, response, "Discarded successfully"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 export {
@@ -496,5 +545,5 @@ export {
   updateCulture,
   getDonorWithTotalMilk,
   updateOtherStatus,
-  discard
+  discard,
 };

@@ -20,7 +20,7 @@ async function RegisterMilkVolume(req, res) {
   });
 
   const donor = await DaanDarta.findOne({ _id: body?.donorId });
-  console.log(donor);
+
   let colostrum;
   const currentDate = new Date();
   const dob = new Date(donor.babyStatus.engDateBirth);
