@@ -3,7 +3,7 @@ import { BabyDetail } from "../Model/baby.model.js";
 import { MilkVolume } from "../Model/volumeOfMilk.model.js";
 import { DaanDarta } from "../Model/donorDetails.model.js";
 import { MilkRequsition } from "../Model/requistion.model.js";
-import { Pasteurization } from '../Model/pasteurization.model.js'
+import { Pasteurization } from "../Model/pasteurization.model.js";
 import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
 async function GetTotalBaby(req, res) {
   try {
@@ -73,28 +73,31 @@ async function GetTotalRequsition(req, res) {
 }
 async function GetMilkCollectedMonthly(req, res) {
   try {
-    const activeFiscalYear = await Fiscal.findOne({status:true})
+    const activeFiscalYear = await Fiscal.findOne({ status: true });
     const response = await MilkVolume.find();
-    
+
     // const bai = response
     //   .map((item) => {
     //       if (item.date.split("-")[1] === "01") {
     //           if (item.totalMilkCollected != null) {
-              
+
     //         return item.totalMilkCollected;
     //       }
     //     }
     //   })
-      const bai = response.filter((item)=>item.date.split("-")[1] === "01" ) .map((item) => {
+    const bai = response
+      .filter((item) => item.date.split("-")[1] === "01")
+      .map((item) => {
         if (item.date.split("-")[1] === "01") {
-            if (item.totalMilkCollected != null) {
-            
-          return item.totalMilkCollected;
+          if (item.totalMilkCollected != null) {
+            return item.totalMilkCollected;
+          }
         }
-      }
-    }).reduce((acc, amt) => acc + amt, 0)
-      console.log(bai)
-    const jestha = response.filter((item)=>item.date.split("-")[1] === "02" )
+      })
+      .reduce((acc, amt) => acc + amt, 0);
+    console.log(bai);
+    const jestha = response
+      .filter((item) => item.date.split("-")[1] === "02")
       .map((item) => {
         if (item.date.split("-")[1] === "02") {
           if (item != null) {
@@ -103,7 +106,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const ashad = response.filter((item)=>item.date.split("-")[1] === "03" )
+    const ashad = response
+      .filter((item) => item.date.split("-")[1] === "03")
       .map((item) => {
         if (item.date.split("-")[1] === "03") {
           if (item != null) {
@@ -112,7 +116,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const sarwan = response.filter((item)=>item.date.split("-")[1] === "04" )
+    const sarwan = response
+      .filter((item) => item.date.split("-")[1] === "04")
       .map((item) => {
         if (item.date.split("-")[1] === "04") {
           if (item != null) {
@@ -121,7 +126,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const bhadra = response.filter((item)=>item.date.split("-")[1] === "05" )
+    const bhadra = response
+      .filter((item) => item.date.split("-")[1] === "05")
       .map((item) => {
         if (item.date.split("-")[1] === "05") {
           if (item != null) {
@@ -130,16 +136,18 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const ashoj = response.filter((item)=>item.date.split("-")[1] === "06" )
+    const ashoj = response
+      .filter((item) => item.date.split("-")[1] === "06")
       .map((item) => {
         if (item.date.split("-")[1] === "06") {
-          if (typeof(item.totalMilkCollected) != null) {
+          if (typeof item.totalMilkCollected != null) {
             return item.totalMilkCollected;
           }
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const kartik = response.filter((item)=>item.date.split("-")[1] === "07" )
+    const kartik = response
+      .filter((item) => item.date.split("-")[1] === "07")
       .map((item) => {
         if (item.date.split("-")[1] === "07") {
           if (item != null) {
@@ -148,7 +156,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const mangsir = response.filter((item)=>item.date.split("-")[1] === "08" )
+    const mangsir = response
+      .filter((item) => item.date.split("-")[1] === "08")
       .map((item) => {
         if (item.date.split("-")[1] === "08") {
           if (item != null) {
@@ -157,7 +166,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const poush = response.filter((item)=>item.date.split("-")[1] === "09" )
+    const poush = response
+      .filter((item) => item.date.split("-")[1] === "09")
       .map((item) => {
         if (item.date.split("-")[1] === "09") {
           if (item != null) {
@@ -166,7 +176,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const magh = response.filter((item)=>item.date.split("-")[1] === "10" )
+    const magh = response
+      .filter((item) => item.date.split("-")[1] === "10")
       .map((item) => {
         if (item.date.split("-")[1] === "10") {
           if (item != null) {
@@ -175,7 +186,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const falgun = response.filter((item)=>item.date.split("-")[1] === "11" )
+    const falgun = response
+      .filter((item) => item.date.split("-")[1] === "11")
       .map((item) => {
         if (item.date.split("-")[1] === "11") {
           if (item != null) {
@@ -184,7 +196,8 @@ async function GetMilkCollectedMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const cahitra = response.filter((item)=>item.date.split("-")[1] === "12" )
+    const cahitra = response
+      .filter((item) => item.date.split("-")[1] === "12")
       .map((item) => {
         if (item.date.split("-")[1] === "12") {
           if (item != null) {
@@ -217,7 +230,8 @@ async function GetMilkCollectedMonthly(req, res) {
 async function GetMilkRequsitionMonthly(req, res) {
   try {
     const response = await MilkRequsition.find({});
-    const bai = response.filter((item)=>item.feedingDate.split("-")[1] === "01" )
+    const bai = response
+      .filter((item) => item.feedingDate.split("-")[1] === "01")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "01") {
           if (item != null) {
@@ -226,7 +240,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const jestha = response.filter((item)=>item.feedingDate.split("-")[1] === "02" )
+    const jestha = response
+      .filter((item) => item.feedingDate.split("-")[1] === "02")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "02") {
           if (item != null) {
@@ -235,7 +250,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const ashad = response.filter((item)=>item.feedingDate.split("-")[1] === "03" )
+    const ashad = response
+      .filter((item) => item.feedingDate.split("-")[1] === "03")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "03") {
           if (item != null) {
@@ -244,7 +260,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const sarwan = response.filter((item)=>item.feedingDate.split("-")[1] === "04" )
+    const sarwan = response
+      .filter((item) => item.feedingDate.split("-")[1] === "04")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "04") {
           if (item != null) {
@@ -253,7 +270,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const bhadra = response.filter((item)=>item.feedingDate.split("-")[1] === "05" )
+    const bhadra = response
+      .filter((item) => item.feedingDate.split("-")[1] === "05")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "05") {
           if (item != null) {
@@ -262,7 +280,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const ashoj = response.filter((item)=>item.feedingDate.split("-")[1] === "06" )
+    const ashoj = response
+      .filter((item) => item.feedingDate.split("-")[1] === "06")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "06") {
           if (item != null) {
@@ -271,7 +290,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const kartik = response.filter((item)=>item.feedingDate.split("-")[1] === "07" )
+    const kartik = response
+      .filter((item) => item.feedingDate.split("-")[1] === "07")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "07") {
           if (item != null) {
@@ -280,7 +300,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const mangsir = response.filter((item)=>item.feedingDate.split("-")[1] === "08" )
+    const mangsir = response
+      .filter((item) => item.feedingDate.split("-")[1] === "08")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "08") {
           if (item != null) {
@@ -289,7 +310,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const poush = response.filter((item)=>item.feedingDate.split("-")[1] === "09" )
+    const poush = response
+      .filter((item) => item.feedingDate.split("-")[1] === "09")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "09") {
           if (item != null) {
@@ -298,7 +320,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const magh = response.filter((item)=>item.feedingDate.split("-")[1] === "10" )
+    const magh = response
+      .filter((item) => item.feedingDate.split("-")[1] === "10")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "10") {
           if (item != null) {
@@ -307,7 +330,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const falgun = response.filter((item)=>item.feedingDate.split("-")[1] === "11" )
+    const falgun = response
+      .filter((item) => item.feedingDate.split("-")[1] === "11")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "11") {
           if (item != null) {
@@ -316,7 +340,8 @@ async function GetMilkRequsitionMonthly(req, res) {
         }
       })
       .reduce((acc, amt) => acc + amt, 0);
-    const cahitra = response.filter((item)=>item.feedingDate.split("-")[1] === "12" )
+    const cahitra = response
+      .filter((item) => item.feedingDate.split("-")[1] === "12")
       .map((item) => {
         if (item.feedingDate.split("-")[1] === "12") {
           if (item != null) {
@@ -347,84 +372,119 @@ async function GetMilkRequsitionMonthly(req, res) {
   }
 }
 
-async function GetRegisteredDonorMonthly(req,res){
+async function GetRegisteredDonorMonthly(req, res) {
   try {
-    const response = await DaanDarta.find({isDonorActive:true});
-    const bai = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "01" ).length
-    console.log(bai)
-  const jestha = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "02" ).length
-  const ashad = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "03" ).length
-   
-  const sarwan = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "04" ).length
-    
-  const bhadra = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "05" ).length
-    
-  const ashoj = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "06" ).length
-    
-  const kartik = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "07" ).length
+    const response = await DaanDarta.find({ isDonorActive: true });
+    const bai = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "01"
+    ).length;
+    console.log(bai);
+    const jestha = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "02"
+    ).length;
+    const ashad = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "03"
+    ).length;
 
-  const mangsir = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "08" ).length
-    
-  const poush = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "09" ).length
-    
-  const magh = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "10" ).length
-   
-  const falgun = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "11" ).length
-  
-  const cahitra = response.filter((item)=>item.donorRegisteredDate?.split("-")[1] === "12" ).length
-  const newArray = [
-    bai,
-    jestha,
-    ashad,
-    sarwan,
-    bhadra,
-    ashoj,
-    kartik,
-    mangsir,
-    poush,
-    magh,
-    falgun,
-    cahitra,
-  ];
+    const sarwan = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "04"
+    ).length;
 
-  return res.status(200).json(new ApiResponse(200,newArray,))
-     
+    const bhadra = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "05"
+    ).length;
+
+    const ashoj = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "06"
+    ).length;
+
+    const kartik = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "07"
+    ).length;
+
+    const mangsir = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "08"
+    ).length;
+
+    const poush = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "09"
+    ).length;
+
+    const magh = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "10"
+    ).length;
+
+    const falgun = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "11"
+    ).length;
+
+    const cahitra = response.filter(
+      (item) => item.donorRegisteredDate?.split("-")[1] === "12"
+    ).length;
+    const newArray = [
+      bai,
+      jestha,
+      ashad,
+      sarwan,
+      bhadra,
+      ashoj,
+      kartik,
+      mangsir,
+      poush,
+      magh,
+      falgun,
+      cahitra,
+    ];
+
+    return res.status(200).json(new ApiResponse(200, newArray));
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
-async function GetTotalPasturizedMilk(req,res){
+async function GetTotalPasturizedMilk(req, res) {
   try {
-    const response = await Pasteurization.find({culture:false});
-    const collectedMilk =  response?.map((item)=>{
-      
-        return item?.collectedVolume
-    })?.reduce((acc,amt)=>acc+amt,0);
-    console.log(collectedMilk)
-    return res.status(200).json(new ApiResponse(200,collectedMilk,'Total Pasturized milk'))
+    const response = await Pasteurization.find({ culture: false });
+    const collectedMilk = response
+      ?.map((item) => {
+        return item?.collectedVolume;
+      })
+      ?.reduce((acc, amt) => acc + amt, 0);
+    console.log(collectedMilk);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, collectedMilk, "Total Pasturized milk"));
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
-async function GetTotalDispensedMilk(req,res){
+async function GetTotalDispensedMilk(req, res) {
   try {
     const response = await BabyDetail.find({});
-    const totalDispense = response?.map((item)=> item.milkConsumed)?.reduce((acc,amt)=>acc+amt,0);
+    const totalDispense = response
+      ?.map((item) => item.milkConsumed)
+      ?.reduce((acc, amt) => acc + amt, 0);
     console.log(totalDispense);
-    return res.status(200).json(new ApiResponse(200,totalDispense,"Total Dispense"))
+    return res
+      .status(200)
+      .json(new ApiResponse(200, totalDispense, "Total Dispense"));
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"));
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
-async function GetDashboardNumber(req,res){
+async function GetDashboardNumber(req, res) {
   try {
-
     // baby details
     const response = await BabyDetail.find({});
     const totalBaby = response.length;
-    //donor 
+    //donor
     const responseDonor = await DaanDarta.find({ isDonorActive: true });
     const totalDonor = responseDonor?.length;
 
@@ -446,87 +506,88 @@ async function GetDashboardNumber(req,res){
     });
     const totalMilkRequ = array?.reduce((acc, amt) => acc + amt, 0);
     //total pasturization
-    const responsePast = await Pasteurization.find({culture:false});
-    const collectedMilk =  responsePast?.map((item)=>{
-      
-        return item?.collectedVolume
-    })?.reduce((acc,amt)=>acc+amt,0);
+    const responsePast = await Pasteurization.find({ culture: false });
+    const collectedMilk = responsePast?.map((item) => {
+      return item?.collectedVolume;
+    });
+    const collectedMilkSum = collectedMilk?.reduce((acc, amt) => acc + amt, 0);
     //total dispense
     const responseDispense = await BabyDetail.find({});
-    const totalDispense = responseDispense?.map((item)=> item.milkConsumed)?.reduce((acc,amt)=>acc+amt,0);
+    const totalDispense = responseDispense
+      ?.map((item) => item.milkConsumed)
+      ?.reduce((acc, amt) => acc + amt, 0);
 
-    const unPasturizedMilk = totalMilkCollected - collectedMilk ;
-    const  pasturizedRemaining = collectedMilk - totalDispense;
-    const baby = await BabyDetail.find( 
-       
-      {
-        $and :[ {milkConsumed:{
-          $gt:0
-        }},{status:true}]
-       });
-    
+    const unPasturizedMilk = totalMilkCollected - collectedMilkSum;
+
+    const pasturizedRemaining = collectedMilkSum - totalDispense;
+    const baby = await BabyDetail.find({
+      $and: [
+        {
+          milkConsumed: {
+            $gt: 0,
+          },
+        },
+        { status: true },
+      ],
+    });
+
     const feededBaby = baby.length;
 
     const result = [
       {
-        title:"Donor Records",
-        recordAmount:totalDonor,
-        imageName:"/assets/images/mother.png",
-        units:''
+        title: "Donor Records",
+        recordAmount: totalDonor,
+        imageName: "/assets/images/mother.png",
+        units: "",
       },
       {
-        title:"Total Baby",
-        recordAmount:totalBaby,
-        imageName:"/assets/images/newborn.png",
-        units:''
+        title: "Total Baby",
+        recordAmount: totalBaby,
+        imageName: "/assets/images/newborn.png",
+        units: "",
       },
       {
-        title:"Recipient Records",
-        recordAmount:feededBaby,
-        imageName:"/assets/images/newborn.png",
-        units:''
-      },
-      // {
-      //   title:"Milk Requsition",
-      //   recordAmount:totalMilkRequ,
-      //   imageName:"/assets/images/record.png",
-      //   units:'ml'
-      // },
-      {
-        title:"Milk Collection",
-        recordAmount:totalMilkCollected,
-        imageName:"/assets/images/feeding-bottle.png",
-        units:'ml'
+        title: "Recipient Records",
+        recordAmount: feededBaby,
+        imageName: "/assets/images/newborn.png",
+        units: "",
       },
       {
-        title:"Total Pasturized Milk",
-        recordAmount:collectedMilk,
-        imageName:"/assets/images/feeding-bottle.png",
-        units:'ml'
+        title: "Milk Collection",
+        recordAmount: totalMilkCollected,
+        imageName: "/assets/images/feeding-bottle.png",
+        units: "ml",
       },
       {
-        title:"Pasturized Remaining Milk",
-        recordAmount:pasturizedRemaining,
-        imageName:"/assets/images/feeding-bottle.png",
-        units:'ml'
+        title: "Total Pasturized Milk",
+        recordAmount: collectedMilkSum,
+        imageName: "/assets/images/feeding-bottle.png",
+        units: "ml",
       },
       {
-        title:"Unpasturized Remaining Milk",
-        recordAmount:unPasturizedMilk,
-        imageName:"/assets/images/feeding-bottle.png",
-        units:'ml'
+        title: "Pasturized Remaining Milk",
+        recordAmount: pasturizedRemaining,
+        imageName: "/assets/images/feeding-bottle.png",
+        units: "ml",
       },
       {
-        title:"Total Milk Dispensed",
-        recordAmount:totalDispense,
-        imageName:"/assets/images/feeding-bottle.png",
-        units:'ml'
+        title: "Unpasturized Remaining Milk",
+        recordAmount: unPasturizedMilk,
+        imageName: "/assets/images/feeding-bottle.png",
+        units: "ml",
       },
-
-    ]
-    return res.status(200).json(new ApiResponse(200,result,"REsult"))
+      {
+        title: "Total Milk Dispensed",
+        recordAmount: totalDispense,
+        imageName: "/assets/images/feeding-bottle.png",
+        units: "ml",
+      },
+    ];
+    return res.status(200).json(new ApiResponse(200, result, "REsult"));
   } catch (error) {
-    return res.status(500).json(new ApiResponse(500,null,"Internal Server Error"))
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
 
@@ -540,5 +601,5 @@ export {
   GetRegisteredDonorMonthly,
   GetTotalPasturizedMilk,
   GetTotalDispensedMilk,
-  GetDashboardNumber
+  GetDashboardNumber,
 };

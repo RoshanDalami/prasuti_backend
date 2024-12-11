@@ -1,14 +1,12 @@
 import { DaanDarta } from "../Model/donorDetails.model.js";
-import { District } from "../Model/officeSetupModels/district.model.js";
+
 import { Fiscal } from "../Model/officeSetupModels/fiscal.model.js";
-import { Palika } from "../Model/officeSetupModels/palika.model.js";
-import { State } from "../Model/officeSetupModels/state.model.js";
+
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Gestational } from "../Model/dropdownModels/gestational.model.js";
 import { Parity } from "../Model/dropdownModels/parity.model.js";
 import { Delivery } from "../Model/dropdownModels/delivery.model.js";
-import {getDays} from "../utils/utils.js";
-import mongoose from "mongoose";
+import { getDays } from "../utils/utils.js";
 
 // Function to get the current fiscal year
 async function getCurrentFiscalYear() {
@@ -207,18 +205,20 @@ export async function GetDonor(req, res) {
     }
     const totalCount = await DaanDarta.countDocuments({ isDonorActive: true });
 
-    const donors = await DaanDarta.find({ isDonorActive: true }, { __v: 0 }).sort({ createdAt: -1 })
-      // .skip((page - 1) * limit)
-      // .limit(limit);
+    const donors = await DaanDarta.find(
+      { isDonorActive: true },
+      { __v: 0 }
+    ).sort({ createdAt: -1 });
+    // .skip((page - 1) * limit)
+    // .limit(limit);
     const totalDonor = await DaanDarta.find({});
-    if(totalDonor){
-    for( const donor of totalDonor){
-
-      const updatedAge = getDays(donor?.engDate,donor?.ageOfChild);
+    if (totalDonor) {
+      for (const donor of totalDonor) {
+        const updatedAge = getDays(donor?.engDate, donor?.ageOfChild);
         console.log(updatedAge);
-      donor.updatedAgeOFChild = parseInt(updatedAge);
-      donor.save()
-    }
+        donor.updatedAgeOFChild = parseInt(updatedAge);
+        donor.save();
+      }
     }
 
     const enrichedDonors = await Promise.all(
@@ -493,12 +493,14 @@ export async function getDonorByGestationalAge(req, res) {
       .json(new ApiResponse(500, null, "Internal Server Error"));
   }
 }
-export async function getDonorReg(req,res){
-  try{
+export async function getDonorReg(req, res) {
+  try {
     const list = await DaanDarta.find({});
-    const hosRegNoList = list?.map((item) =>  item.hosRegNo);
-    return res.status(200).json(new ApiResponse(200, hosRegNoList,'list'));
-  }catch(error){
-    return res.status(500).json(new ApiResponse(500,null,'internal server error'))
+    const hosRegNoList = list?.map((item) => item.hosRegNo);
+    return res.status(200).json(new ApiResponse(200, hosRegNoList, "list"));
+  } catch (error) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "internal server error"));
   }
 }
